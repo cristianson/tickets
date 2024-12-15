@@ -161,7 +161,7 @@ export default function ImageGallery() {
           <Button
             variant="outline"
             size="icon"
-            className="hidden sm:flex absolute left-[-4rem] top-1/2 transform -translate-y-1/2 z-10 rounded-full hover:bg-white transition-all duration-200 border-gray-200"
+            className="hidden sm:flex absolute left-[-8rem] top-1/2 transform -translate-y-1/2 z-10 rounded-full hover:bg-white transition-all duration-200 border-gray-200"
             onClick={goToPrevious}
             aria-label="Previous image"
           >
@@ -170,7 +170,7 @@ export default function ImageGallery() {
           <Button
             variant="outline"
             size="icon"
-            className="hidden sm:flex absolute right-[-4rem] top-1/2 transform -translate-y-1/2 z-10 rounded-full hover:bg-white transition-all duration-200 border-gray-200"
+            className="hidden sm:flex absolute right-[-8rem] top-1/2 transform -translate-y-1/2 z-10 rounded-full hover:bg-white transition-all duration-200 border-gray-200"
             onClick={goToNext}
             aria-label="Next image"
           >
