@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import Button from './ui/Button'
+import Button from './ui/button'
 
 type ImageData = {
   city: string
