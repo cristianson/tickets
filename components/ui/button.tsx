@@ -1,44 +1,36 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/lib/utils"
+import { ButtonHTMLAttributes } from 'react'
+import { cn } from '@/lib/utils'
 
-const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        outline: "border border-input hover:bg-accent hover:text-accent-foreground",
-      },
-      size: {
-        default: "h-10 py-2 px-4",
-        sm: "h-9 px-3 rounded-md",
-        lg: "h-11 px-8 rounded-md",
-        icon: "h-10 w-10",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  position?: 'left' | 'right'
+  isMobile?: boolean
+}
+
+const Button = ({ 
+  className,
+  position,
+  isMobile = false,
+  ...props 
+}: ButtonProps) => {
+  const baseStyles = "w-10 h-10 bg-gray-25 rounded-full border border-gray-200 flex items-center justify-center hover:bg-white hover:transition-all duration-200 active:scale-95"
+  
+  const positionStyles = {
+    left: "hidden sm:flex absolute left-[-8rem] top-1/2 transform -translate-y-1/2 z-10",
+    right: "hidden sm:flex absolute right-[-8rem] top-1/2 transform -translate-y-1/2 z-10"
   }
-)
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {}
-
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, ...props }, ref) => {
-    return (
-      <button
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    )
+  const getStyles = () => {
+    if (isMobile) return baseStyles
+    if (position) return cn(baseStyles, positionStyles[position])
+    return baseStyles
   }
-)
-Button.displayName = "Button"
 
-export { Button, buttonVariants } 
+  return (
+    <button
+      className={cn(getStyles(), className)}
+      {...props}
+    />
+  )
+}
+
+export default Button
