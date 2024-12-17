@@ -1,15 +1,18 @@
 import { ButtonHTMLAttributes } from 'react'
 import { cn } from '@/lib/utils'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   position?: 'left' | 'right'
   isMobile?: boolean
+  variant?: 'next' | 'previous'
 }
 
 const Button = ({ 
   className,
   position,
   isMobile = false,
+  variant,
   ...props 
 }: ButtonProps) => {
   const baseStyles = "w-10 h-10 bg-gray-25 rounded-full border border-gray-200 flex items-center justify-center transition-all duration-200 active:scale-95 hover:bg-gray-100 hover:border-gray-300"
@@ -29,7 +32,10 @@ const Button = ({
     <button
       className={cn(getStyles(), className)}
       {...props}
-    />
+    >
+      {variant === 'previous' && <ChevronLeft className="h-4 w-4" />}
+      {variant === 'next' && <ChevronRight className="h-4 w-4" />}
+    </button>
   )
 }
 

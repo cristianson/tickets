@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Button from './ui/button'
 
@@ -119,21 +118,13 @@ export default function ImageGallery() {
 
           {/* Mobile Navigation */}
           <div className="flex justify-center gap-8 mt-11 sm:hidden">
-            <Button onClick={goToPrevious} aria-label="Previous image" isMobile>
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button onClick={goToNext} aria-label="Next image" isMobile>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+            <Button onClick={goToPrevious} aria-label="Previous image" isMobile variant="previous" />
+            <Button onClick={goToNext} aria-label="Next image" isMobile variant="next" />
           </div>
 
           {/* Desktop Navigation */}
-          <Button onClick={goToPrevious} aria-label="Previous image" position="left">
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button onClick={goToNext} aria-label="Next image" position="right">
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          <Button onClick={goToPrevious} aria-label="Previous image" position="left" variant="previous" />
+          <Button onClick={goToNext} aria-label="Next image" position="right" variant="next" />
         </div>
       </div>
     </div>
