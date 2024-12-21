@@ -1,26 +1,31 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
-import Button from './ui/button'
+import { useState } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import Button from "./ui/button";
 
 type ImageData = {
-  city: string
-  transport: string
-}
+  city: string;
+  transport: string;
+};
 
 const IMAGES = [
-  'https://i.ibb.co/vBqpxC2/Subject-2.png',
-  'https://i.ibb.co/zN1BKjs/Subject.png',
-] as const
+  "https://i.ibb.co/vBqpxC2/Subject-2.png",
+  "https://i.ibb.co/zN1BKjs/Subject.png",
+] as const;
 
 const IMAGE_DATA: ImageData[] = [
   { city: "Warsaw, Poland", transport: "Train" },
   { city: "Amsterdam, Netherlands", transport: "Train" },
-]
+];
 
-const ANIMATION_OFFSET = 350
+const BACKGROUND_IMAGES = [
+  "https://i.ibb.co/sHQVNLw/Krakow.png",
+  "https://i.ibb.co/PGM7WnM/Amsterdam-2.png",
+] as const;
+
+const ANIMATION_OFFSET = 350;
 
 const slideVariants = {
   enter: (direction: number) => ({
@@ -37,31 +42,71 @@ const slideVariants = {
     x: direction < 0 ? ANIMATION_OFFSET : -ANIMATION_OFFSET,
     opacity: 0,
   }),
-}
+};
 
 const fadeVariants = {
   enter: { opacity: 0 },
   center: { opacity: 1 },
   exit: { opacity: 0 },
-}
+};
 
 export default function ImageGallery() {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [direction, setDirection] = useState(0)
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
 
   const goToPrevious = () => {
-    setDirection(-1)
-    setCurrentIndex((prevIndex) => (prevIndex === 0 ? IMAGES.length - 1 : prevIndex - 1))
-  }
+    setDirection(-1);
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? IMAGES.length - 1 : prevIndex - 1
+    );
+  };
 
   const goToNext = () => {
-    setDirection(1)
-    setCurrentIndex((prevIndex) => (prevIndex === IMAGES.length - 1 ? 0 : prevIndex + 1))
-  }
+    setDirection(1);
+    setCurrentIndex((prevIndex) =>
+      prevIndex === IMAGES.length - 1 ? 0 : prevIndex + 1
+    );
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4 sm:px-12">
-      <div className="w-full max-w-[350px] flex flex-col items-center">
+    <div className="flex flex-row items-center justify-center min-h-screen px-4 sm:px-12">
+      {/* Desktop Navigation */}
+      <div className="fixed bottom-12 left-0 right-0 w-full flex justify-center items-center gap-8 sm:hidden z-[100]">
+        <Button
+          onClick={goToPrevious}
+          aria-label="Previous image"
+          variant="previous"
+          isMobile
+        />
+        <Button
+          onClick={goToNext}
+          aria-label="Next image"
+          variant="next"
+          isMobile
+        />
+      </div>
+
+      {/* Mobile Navigation */}
+      <div className="hidden sm:flex absolute left-4 right-4 justify-between items-center">
+        <Button
+          onClick={goToPrevious}
+          aria-label="Previous image"
+          variant="previous"
+        />
+        <Button onClick={goToNext} aria-label="Next image" variant="next" />
+      </div>
+
+      <div
+        className="w-full flex flex-col items-center justify-center max-w-[902px] min-h-[572px] mx-4 relative bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `
+      radial-gradient(50% 50% at 51.58% 50%, rgba(255, 255, 255, 0.00) 0%, #FFF 100%),
+      url(${BACKGROUND_IMAGES[currentIndex]})
+    `,
+          transition: "background-image 0.5s ease-in-out",
+        }}
+      >
+        {" "}
         {/* Location Text */}
         <div className="h-[72px] flex flex-col items-center justify-center">
           <AnimatePresence mode="wait">
@@ -83,10 +128,9 @@ export default function ImageGallery() {
             </motion.div>
           </AnimatePresence>
         </div>
-
         {/* Image Gallery */}
-        <div className="relative w-full mt-12">
-          <div className="w-full sm:w-[350px] relative mb-4">
+        <div className="relative w-full mt-12 flex justify-center">
+          <div className="w-full max-w-[350px] relative mb-4">
             <div className="relative" style={{ minHeight: 200 }}>
               <AnimatePresence initial={false} custom={direction} mode="wait">
                 <motion.div
@@ -107,7 +151,7 @@ export default function ImageGallery() {
                     alt={`${IMAGE_DATA[currentIndex].city} transport ticket`}
                     width={350}
                     height={0}
-                    style={{ width: '100%', height: 'auto' }}
+                    style={{ width: "100%", height: "auto" }}
                     className="rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
                     priority
                   />
@@ -115,18 +159,8 @@ export default function ImageGallery() {
               </AnimatePresence>
             </div>
           </div>
-
-          {/* Mobile Navigation */}
-          <div className="flex justify-center gap-8 mt-11 sm:hidden">
-            <Button onClick={goToPrevious} aria-label="Previous image" isMobile variant="previous" />
-            <Button onClick={goToNext} aria-label="Next image" isMobile variant="next" />
-          </div>
-
-          {/* Desktop Navigation */}
-          <Button onClick={goToPrevious} aria-label="Previous image" position="left" variant="previous" />
-          <Button onClick={goToNext} aria-label="Next image" position="right" variant="next" />
         </div>
       </div>
     </div>
-  )
+  );
 }
