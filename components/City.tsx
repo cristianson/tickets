@@ -40,7 +40,7 @@ export default function City({ city, direction, index }: Props) {
       style={{
         backgroundImage: `
   radial-gradient(50% 50% at 51.58% 50%, rgba(255, 255, 255, 0.00) 0%, #FFF 100%),
-  url(${city.background})
+  url(${city.backgroundImage})
 `,
         transition: "background-image 0.5s ease-in-out",
       }}
@@ -86,7 +86,7 @@ export default function City({ city, direction, index }: Props) {
                 className="w-full absolute top-0 left-0"
               >
                 <Image
-                  src={city.image}
+                  src={city.ticketImage}
                   alt={`${city.city} transport ticket`}
                   width={350}
                   height={0}
