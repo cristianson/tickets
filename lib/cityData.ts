@@ -9,8 +9,8 @@ const Cities: CityData[] = [
   {
     city: "Warsaw, Poland",
     transport: "Train",
-    ticketImage: "/tickets/krakow.png",
-    backgroundImage: "/maps/bg_krakow.png",
+    ticketImage: "/tickets/warsaw.png",
+    backgroundImage: "/maps/bg_warsaw.png",
   },
   {
     city: "Amsterdam, Netherlands",
