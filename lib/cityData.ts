@@ -1,7 +1,10 @@
 export type CityData = {
   city: string;
   transport: string;
-  ticketImage: string;
+  ticketImage: {
+    front: string;
+    back: string;
+  };
   backgroundImage: string;
 };
 
@@ -9,13 +12,19 @@ const Cities: CityData[] = [
   {
     city: "Warsaw, Poland",
     transport: "Train",
-    ticketImage: "/tickets/warsaw.png",
+    ticketImage: {
+      front: "/tickets/warsaw.png",
+      back: "/tickets/amsterdam.png",
+    },
     backgroundImage: "/maps/bg_warsaw.png",
   },
   {
     city: "Amsterdam, Netherlands",
     transport: "Train",
-    ticketImage: "/tickets/amsterdam.png",
+    ticketImage: {
+      front: "/tickets/amsterdam.png",
+      back: "/tickets/amsterdam-back.png",
+    },
     backgroundImage: "/maps/bg_amsterdam.png",
   },
 ] as const;
