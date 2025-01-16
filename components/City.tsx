@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { CityData } from "@/lib/cityData";
 import { AnimatePresence, motion } from "framer-motion";
+import { withFlip } from "./withFlip";
+import { useRef } from "react";
 
 const fadeVariants = {
   enter: { opacity: 0 },
@@ -27,26 +29,45 @@ const slideVariants = {
   }),
 };
 
+type ImageProps = {
+  ticketImage: CityData["ticketImage"];
+  cityName: string;
+  side?: "front" | "back";
+};
+
+const TicketImage = ({ ticketImage, cityName, side = "front" }: ImageProps) => (
+  <Image
+    src={side === "front" ? ticketImage.front : ticketImage.back}
+    alt={`${cityName} transport ticket ${side}`}
+    width={350}
+    height={0}
+    style={{ width: "100%", height: "auto" }}
+    className="rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
+    priority
+  />
+);
+
+const FlippableTicket = withFlip(TicketImage);
+
 type Props = {
   city: CityData;
   direction: number;
   index: number;
+  onToggleFlip?: (toggleFn: () => void) => void;
 };
 
-export default function City({ city, direction, index }: Props) {
+export default function City({ city, direction, index, onToggleFlip }: Props) {
   return (
     <div
       className="w-full flex flex-col items-center justify-center max-w-[902px] min-h-[572px] relative bg-cover bg-center bg-no-repeat"
       style={{
         backgroundImage: `
-  radial-gradient(50% 50% at 51.58% 50%, rgba(255, 255, 255, 0.00) 0%, #FFF 100%),
-  url(${city.backgroundImage})
-`,
+          radial-gradient(50% 50% at 51.58% 50%, rgba(255, 255, 255, 0.00) 0%, #FFF 100%),
+          url(${city.backgroundImage})
+        `,
         transition: "background-image 0.5s ease-in-out",
       }}
     >
-      {" "}
-      {/* Location Text */}
       <div className="h-[72px] flex flex-col items-center justify-center">
         <AnimatePresence mode="wait">
           <motion.div
@@ -67,7 +88,6 @@ export default function City({ city, direction, index }: Props) {
           </motion.div>
         </AnimatePresence>
       </div>
-      {/* Image Gallery */}
       <div className="relative w-full mt-12 flex justify-center">
         <div className="w-full max-w-[350px] relative mb-4">
           <div className="relative" style={{ minHeight: 200 }}>
@@ -85,14 +105,10 @@ export default function City({ city, direction, index }: Props) {
                 }}
                 className="w-full absolute top-0 left-0"
               >
-                <Image
-                  src={city.ticketImage}
-                  alt={`${city.city} transport ticket`}
-                  width={350}
-                  height={0}
-                  style={{ width: "100%", height: "auto" }}
-                  className="rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
-                  priority
+                <FlippableTicket
+                  ticketImage={city.ticketImage}
+                  cityName={city.city}
+                  onToggleFlip={onToggleFlip}
                 />
               </motion.div>
             </AnimatePresence>
