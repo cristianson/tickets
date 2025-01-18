@@ -42,7 +42,7 @@ const TicketImage = ({ ticketImage, cityName, side = "front" }: ImageProps) => (
     width={350}
     height={0}
     style={{ width: "100%", height: "auto" }}
-    className="rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
+    // className="shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
     priority
   />
 );
