@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import Button from "./ui/button";
 import FlipButton from "./ui/flipButton";
 import Cities from "@/lib/cityData";
 import City from "./City";
+import CityText from "./ui/cityText";
 
 export default function ImageGallery() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -32,6 +32,11 @@ export default function ImageGallery() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-8">
+      <CityText
+        city={Cities[currentIndex].city}
+        transport={Cities[currentIndex].transport}
+        index={currentIndex}
+      />
       <div className="flex flex-row w-full items-center justify-center px-4 sm:px-12 gap-4">
         <Button
           className="hidden sm:flex"
@@ -67,6 +72,7 @@ export default function ImageGallery() {
           isMobile
         />
       </div>
+
       <FlipButton
         onClick={() => toggleFlipRef.current?.()}
         className="absolute bottom-4 right-4"
