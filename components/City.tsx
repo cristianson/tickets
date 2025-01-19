@@ -2,7 +2,6 @@ import Image from "next/image";
 import { CityData } from "@/lib/cityData";
 import { AnimatePresence, motion } from "framer-motion";
 import { withFlip } from "./withFlip";
-import { useRef } from "react";
 
 const fadeVariants = {
   enter: { opacity: 0 },
@@ -68,52 +67,31 @@ export default function City({ city, direction, index, onToggleFlip }: Props) {
         transition: "background-image 0.5s ease-in-out",
       }}
     >
-      <div className="h-[72px] flex flex-col items-center justify-center">
-        <AnimatePresence mode="wait">
+      <div
+        className="w-full max-w-[350px] relative flex flex-col items-center justify-center"
+        style={{ minHeight: 200 }}
+      >
+        <AnimatePresence initial={false} custom={direction} mode="wait">
           <motion.div
-            key={index + "-text"}
+            key={index}
+            custom={direction}
+            variants={slideVariants}
             initial="enter"
             animate="center"
             exit="exit"
-            variants={fadeVariants}
-            transition={{ opacity: { duration: 0.2 } }}
-            className="flex flex-col items-center px-4 text-center"
+            transition={{
+              x: { type: "spring", stiffness: 500, damping: 40 },
+              opacity: { duration: 0.15 },
+            }}
+            className="w-full top-0 left-0"
           >
-            <h1 className="font-inter text-[#181D27] text-xl font-bold tracking-[-0.04em] mb-1">
-              {city.city}
-            </h1>
-            <h2 className="font-inter text-[#535862] text-lg tracking-[-0.03em]">
-              {city.transport}
-            </h2>
+            <FlippableTicket
+              ticketImage={city.ticketImage}
+              cityName={city.city}
+              onToggleFlip={onToggleFlip}
+            />
           </motion.div>
         </AnimatePresence>
-      </div>
-      <div className="relative w-full mt-12 flex justify-center">
-        <div className="w-full max-w-[350px] relative mb-4">
-          <div className="relative" style={{ minHeight: 200 }}>
-            <AnimatePresence initial={false} custom={direction} mode="wait">
-              <motion.div
-                key={index}
-                custom={direction}
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{
-                  x: { type: "spring", stiffness: 500, damping: 40 },
-                  opacity: { duration: 0.15 },
-                }}
-                className="w-full absolute top-0 left-0"
-              >
-                <FlippableTicket
-                  ticketImage={city.ticketImage}
-                  cityName={city.city}
-                  onToggleFlip={onToggleFlip}
-                />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
       </div>
     </div>
   );
