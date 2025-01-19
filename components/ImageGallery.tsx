@@ -31,7 +31,7 @@ export default function ImageGallery() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-8">
+    <div className="flex flex-col items-center justify-center min-h-screen">
       <CityText
         city={Cities[currentIndex].city}
         transport={Cities[currentIndex].transport}
