@@ -67,32 +67,31 @@ export default function City({ city, direction, index, onToggleFlip }: Props) {
         transition: "background-image 0.5s ease-in-out",
       }}
     >
-      <div className="relative w-full mt-12 flex justify-center">
-        <div className="w-full max-w-[350px] relative mb-4">
-          <div className="relative" style={{ minHeight: 200 }}>
-            <AnimatePresence initial={false} custom={direction} mode="wait">
-              <motion.div
-                key={index}
-                custom={direction}
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{
-                  x: { type: "spring", stiffness: 500, damping: 40 },
-                  opacity: { duration: 0.15 },
-                }}
-                className="w-full absolute top-0 left-0"
-              >
-                <FlippableTicket
-                  ticketImage={city.ticketImage}
-                  cityName={city.city}
-                  onToggleFlip={onToggleFlip}
-                />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
+      <div
+        className="w-full max-w-[350px] relative flex flex-col items-center justify-center"
+        style={{ minHeight: 200 }}
+      >
+        <AnimatePresence initial={false} custom={direction} mode="wait">
+          <motion.div
+            key={index}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: "spring", stiffness: 500, damping: 40 },
+              opacity: { duration: 0.15 },
+            }}
+            className="w-full top-0 left-0"
+          >
+            <FlippableTicket
+              ticketImage={city.ticketImage}
+              cityName={city.city}
+              onToggleFlip={onToggleFlip}
+            />
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
