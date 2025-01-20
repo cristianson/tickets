@@ -17,7 +17,7 @@ const Button = ({
 }: ButtonProps) => {
   const baseStyles = `
     w-12 h-12
-    min-w-[48px] min-h-[48px]                                        
+    w-9 h-9                                     
     bg-white                     
     rounded-full                 
     border border-gray-200       
@@ -26,14 +26,15 @@ const Button = ({
     justify-center               
     transition-all duration-200                  
     hover:bg-gray-50
-    active:scale-95                             
+    active:scale-95
+    shadow-xsSkeumorphic
   `;
 
   return (
     <button className={cn(baseStyles, className)} {...props}>
       <div className="flex items-center justify-center w-full h-full">
-        {variant === "previous" && <ChevronLeft className="h-6 w-6" />}
-        {variant === "next" && <ChevronRight className="h-6 w-6" />}
+        {variant === "previous" && <ChevronLeft className="h-5 w-5" />}
+        {variant === "next" && <ChevronRight className="h-5 w-5" />}
       </div>
     </button>
   );
