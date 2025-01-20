@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import Button from "./ui/button";
+import Button from "./ui/chevronButton";
 import FlipButton from "./ui/flipButton";
 import Cities from "@/lib/cityData";
 import City from "./City";
@@ -75,7 +75,7 @@ export default function ImageGallery() {
 
       <FlipButton
         onClick={() => toggleFlipRef.current?.()}
-        className="absolute bottom-4 right-4"
+        className="bottom-4 right-4"
       />
     </div>
   );
