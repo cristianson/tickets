@@ -58,7 +58,7 @@ type Props = {
 export default function City({ city, direction, index, onToggleFlip }: Props) {
   return (
     <div
-      className="w-full flex flex-col items-center justify-center max-w-[902px] min-h-[572px] relative bg-cover bg-center bg-no-repeat"
+      className="w-full flex flex-col items-center justify-center max-w-[902px] min-h-[540px] relative bg-cover bg-center bg-no-repeat"
       style={{
         backgroundImage: `
           radial-gradient(50% 50% at 51.58% 50%, rgba(255, 255, 255, 0.00) 0%, #FFF 100%),
