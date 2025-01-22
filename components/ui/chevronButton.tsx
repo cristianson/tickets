@@ -16,7 +16,6 @@ const Button = ({
   ...props
 }: ButtonProps) => {
   const baseStyles = `
-    w-12 h-12
     w-9 h-9                                     
     bg-white                     
     rounded-full                 
