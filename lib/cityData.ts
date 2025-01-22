@@ -13,37 +13,37 @@ const Cities: CityData[] = [
     city: "Warsaw, Poland",
     transport: "Train",
     ticketImage: {
-      front: "/tickets/warsaw/warsaw_front.png",
-      back: "/tickets/warsaw/warsaw_back.png",
+      front: "/tickets/warsaw/warsaw_front.webp",
+      back: "/tickets/warsaw/warsaw_back.webp",
     },
-    backgroundImage: "/maps/bg_warsaw.png",
+    backgroundImage: "/maps/bg_warsaw.webp",
   },
   {
     city: "Amsterdam, Netherlands",
     transport: "Train",
     ticketImage: {
-      front: "/tickets/amsterdam/amsterdam_front.png",
-      back: "/tickets/amsterdam/amsterdam_back.png",
+      front: "/tickets/amsterdam/amsterdam_front.webp",
+      back: "/tickets/amsterdam/amsterdam_back.webp",
     },
-    backgroundImage: "/maps/bg_amsterdam.png",
+    backgroundImage: "/maps/bg_amsterdam.webp",
   },
   {
     city: "Berlin, Germany",
     transport: "Train",
     ticketImage: {
-      front: "/tickets/berlin/berlin_front.png",
-      back: "/tickets/berlin/berlin_back.png",
+      front: "/tickets/berlin/berlin_front.webp",
+      back: "/tickets/berlin/berlin_back.webp",
     },
-    backgroundImage: "/maps/bg_berlin.png",
+    backgroundImage: "/maps/bg_berlin.webp",
   },
   {
     city: "Cluj-Napoca, Romania",
     transport: "Bus",
     ticketImage: {
-      front: "/tickets/cluj/cluj_front.png",
-      back: "/tickets/cluj/cluj_back.png",
+      front: "/tickets/cluj/cluj_front.webp",
+      back: "/tickets/cluj/cluj_back.webp",
     },
-    backgroundImage: "/maps/bg_cluj.png",
+    backgroundImage: "/maps/bg_cluj.webp",
   },
 ] as const;
 
