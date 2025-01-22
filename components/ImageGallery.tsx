@@ -58,25 +58,28 @@ export default function ImageGallery() {
         />
       </div>
       {/* Mobile Navigation */}
-      <div className="flex sm:hidden flex-row items-center gap-8">
-        <Button
-          onClick={goToPrevious}
-          aria-label="Previous image"
-          variant="previous"
-          isMobile
-        />
-        <Button
-          onClick={goToNext}
-          aria-label="Next image"
-          variant="next"
-          isMobile
-        />
+      <div className="flex items-center sm:justify-center justify-between w-[350px] gap-8">
+        <div className="flex sm:hidden flex-row items-center gap-4">
+          <Button
+            onClick={goToPrevious}
+            aria-label="Previous image"
+            variant="previous"
+            isMobile
+          />
+          <Button
+            onClick={goToNext}
+            aria-label="Next image"
+            variant="next"
+            isMobile
+          />
+        </div>
+        <div className="flex items-center justify-center">
+          <FlipButton
+            onClick={() => toggleFlipRef.current?.()}
+            className="bottom-4 right-4"
+          />
+        </div>
       </div>
-
-      <FlipButton
-        onClick={() => toggleFlipRef.current?.()}
-        className="bottom-4 right-4"
-      />
     </div>
   );
 }
