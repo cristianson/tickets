@@ -37,7 +37,7 @@ const Cities: CityData[] = [
     backgroundImage: "/maps/bg_berlin.png",
   },
   {
-    city: "Cluj, Romania",
+    city: "Cluj-Napoca, Romania",
     transport: "Bus",
     ticketImage: {
       front: "/tickets/cluj/cluj_front.png",
