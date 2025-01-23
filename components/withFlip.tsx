@@ -15,7 +15,7 @@ export function withFlip<T extends object>(Component: ComponentType<T>) {
     // Add new state and ref for mouse movement effect
     const [rotateXaxis, setRotateXaxis] = useState(0);
     const [rotateYaxis, setRotateYaxis] = useState(0);
-    const ref = useRef(null);
+    const ref = useRef<HTMLDivElement>(null);
 
     // Add springs for smooth animation
     const dx = useSpring(0, spring);
@@ -24,6 +24,8 @@ export function withFlip<T extends object>(Component: ComponentType<T>) {
     // Handle mouse movement for 3D effect
     const handleMouseMove = (event: any) => {
       const element = ref.current;
+      if (!element) return;
+
       const elementRect = element.getBoundingClientRect();
       const elementWidth = elementRect.width;
       const elementHeight = elementRect.height;
