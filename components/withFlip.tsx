@@ -26,6 +26,10 @@ export function withFlip<T extends object>(Component: ComponentType<T>) {
       const element = ref.current;
       if (!element) return;
 
+      // Check if the screen width is greater than a certain breakpoint (e.g., 1024px for desktop)
+      if (window.innerWidth < 1024) {
+        return; // Don't apply the effect on smaller devices
+      }
       const elementRect = element.getBoundingClientRect();
       const elementWidth = elementRect.width;
       const elementHeight = elementRect.height;
