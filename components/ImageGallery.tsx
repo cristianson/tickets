@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import Button from "./ui/chevronButton";
 import FlipButton from "./ui/flipButton";
 import Cities from "@/lib/cityData";
@@ -11,6 +11,7 @@ export default function ImageGallery() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const toggleFlipRef = useRef<() => void>();
+  const currentCity = useMemo(() => Cities[currentIndex], [currentIndex]);
 
   const goToPrevious = () => {
     setDirection(-1);
@@ -26,15 +27,15 @@ export default function ImageGallery() {
     );
   };
 
-  const handleToggleFlip = (toggleFn: () => void) => {
+  const handleToggleFlip = useCallback((toggleFn: () => void) => {
     toggleFlipRef.current = toggleFn;
-  };
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <CityText
-        city={Cities[currentIndex].city}
-        transport={Cities[currentIndex].transport}
+        city={currentCity.city}
+        transport={currentCity.transport}
         index={currentIndex}
       />
       <div className="flex flex-row w-full items-center justify-center px-4 sm:px-12 gap-4">
@@ -45,7 +46,7 @@ export default function ImageGallery() {
           variant="previous"
         />
         <City
-          city={Cities[currentIndex]}
+          city={currentCity}
           direction={direction}
           index={currentIndex}
           onToggleFlip={handleToggleFlip}
@@ -58,7 +59,7 @@ export default function ImageGallery() {
         />
       </div>
       {/* Mobile Navigation */}
-      <div className="flex items-center sm:justify-center justify-between w-[350px] gap-8">
+      <div className="flex items-center sm:justify-center justify-between w-full max-w-[350px] gap-8 px-3">
         <div className="flex sm:hidden flex-row items-center gap-4">
           <Button
             onClick={goToPrevious}
