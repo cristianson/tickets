@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import Button from "./ui/chevronButton";
 import FlipButton from "./ui/flipButton";
 import Cities from "@/lib/cityData";
@@ -27,9 +27,9 @@ export default function ImageGallery() {
     );
   };
 
-  const handleToggleFlip = (toggleFn: () => void) => {
+  const handleToggleFlip = useCallback((toggleFn: () => void) => {
     toggleFlipRef.current = toggleFn;
-  };
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
@@ -59,7 +59,7 @@ export default function ImageGallery() {
         />
       </div>
       {/* Mobile Navigation */}
-      <div className="flex items-center sm:justify-center justify-between w-[350px] gap-8">
+      <div className="flex items-center sm:justify-center justify-between w-full max-w-[350px] gap-8 px-3">
         <div className="flex sm:hidden flex-row items-center gap-4">
           <Button
             onClick={goToPrevious}
