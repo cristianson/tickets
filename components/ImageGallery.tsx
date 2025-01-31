@@ -11,6 +11,7 @@ export default function ImageGallery() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const toggleFlipRef = useRef<() => void>();
+  const currentCity = Cities[currentIndex];
 
   const goToPrevious = () => {
     setDirection(-1);
@@ -33,8 +34,8 @@ export default function ImageGallery() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <CityText
-        city={Cities[currentIndex].city}
-        transport={Cities[currentIndex].transport}
+        city={currentCity.city}
+        transport={currentCity.transport}
         index={currentIndex}
       />
       <div className="flex flex-row w-full items-center justify-center px-4 sm:px-12 gap-4">
@@ -45,7 +46,7 @@ export default function ImageGallery() {
           variant="previous"
         />
         <City
-          city={Cities[currentIndex]}
+          city={currentCity}
           direction={direction}
           index={currentIndex}
           onToggleFlip={handleToggleFlip}
