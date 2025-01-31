@@ -6,6 +6,7 @@ import FlipButton from "./ui/flipButton";
 import Cities from "@/lib/cityData";
 import City from "./City";
 import CityText from "./ui/cityText";
+import VaulDrawer from "./ui/drawer";
 
 export default function ImageGallery() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -79,6 +80,7 @@ export default function ImageGallery() {
             className="bottom-4 right-4"
           />
         </div>
+        <VaulDrawer></VaulDrawer>
       </div>
     </div>
   );
