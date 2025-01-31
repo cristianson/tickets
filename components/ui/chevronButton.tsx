@@ -31,7 +31,7 @@ const Button = ({
 
   return (
     <button className={cn(baseStyles, className)} {...props}>
-      <div className="flex items-center justify-center w-full h-full">
+      <div className="flex items-center justify-center w-[34px] h-[34px]">
         {variant === "previous" && <ChevronLeft className="h-5 w-5" />}
         {variant === "next" && <ChevronRight className="h-5 w-5" />}
       </div>
