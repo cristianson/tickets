@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import Button from "./ui/chevronButton";
 import FlipButton from "./ui/flipButton";
 import Cities from "@/lib/cityData";
@@ -11,7 +11,7 @@ export default function ImageGallery() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const toggleFlipRef = useRef<() => void>();
-  const currentCity = Cities[currentIndex];
+  const currentCity = useMemo(() => Cities[currentIndex], [currentIndex]);
 
   const goToPrevious = () => {
     setDirection(-1);
