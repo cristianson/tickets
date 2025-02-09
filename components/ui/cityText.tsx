@@ -28,7 +28,7 @@ export default function CityText({ city, transport, index }: CityTextProps) {
           <h1 className="font-inter text-[#181D27] text-xl font-bold tracking-[-0.04em] mb-1">
             {city}
           </h1>
-          <h2 className="font-inter text-[#535862] text-lg tracking-[-0.03em]">
+          <h2 className="font-inter font-medium text-[#535862] text-lg tracking-[-0.03em]">
             {transport}
           </h2>
         </motion.div>
