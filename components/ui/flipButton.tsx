@@ -24,7 +24,10 @@ export default function FlipButton({
   `;
 
   return (
-    <button onClick={onClick} className={`${baseStyles} ${className}`}>
+    <button
+      onClick={onClick}
+      className={`${baseStyles} ${className} text-gray-600`}
+    >
       <span className="text-sm font-medium">Flip ticket</span>
       <svg
         width="20"
@@ -36,7 +39,7 @@ export default function FlipButton({
       >
         <path
           d="M3 8.00002H14.25C16.3211 8.00002 18 9.67895 18 11.75C18 13.8211 16.3211 15.5 14.25 15.5H10.5M3 8.00002L6.33333 4.66669M3 8.00002L6.33333 11.3334"
-          stroke="#414651"
+          stroke="currentColor"
           strokeWidth="1.66667"
           strokeLinecap="round"
           strokeLinejoin="round"
