@@ -11,7 +11,7 @@ export default function FlipButton({
     h-9
     px-3
     bg-white
-    rounded-lg
+    rounded-xl
     border border-gray-200
     inline-flex
     gap-1.5
