@@ -45,6 +45,15 @@ const Cities: CityData[] = [
     },
     backgroundImage: "/maps/bg_cluj.webp",
   },
+  {
+    city: "Hamburg, Germany",
+    transport: "Train",
+    ticketImage: {
+      front: "/tickets/hamburg/hamburg_front.webp",
+      back: "/tickets/hamburg/hamburg_back.webp",
+    },
+    backgroundImage: "/maps/bg_hamburg.webp",
+  },
 ] as const;
 
 export default Cities;
