@@ -40,8 +40,13 @@ const TicketImage = ({ ticketImage, cityName, side = "front" }: ImageProps) => (
     alt={`${cityName} transport ticket ${side}`}
     width={350}
     height={0}
-    style={{ width: "100%", height: "auto" }}
-    // className="shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
+    style={{
+      maxHeight: "450px", //Max height of the ticket image
+      width: "auto",
+      height: "auto",
+      objectFit: "contain",
+      maxWidth: "100%",
+    }}
     priority
   />
 );
@@ -69,7 +74,7 @@ export default function City({ city, direction, index, onToggleFlip }: Props) {
     >
       <div
         className="w-full max-w-[350px] relative flex flex-col items-center justify-center"
-        style={{ minHeight: 200 }}
+        style={{ minHeight: 200, maxHeight: "760px", overflow: "visible" }}
       >
         <AnimatePresence initial={false} custom={direction} mode="wait">
           <motion.div
