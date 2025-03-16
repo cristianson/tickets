@@ -63,12 +63,18 @@ export function withFlip<T extends object>(Component: ComponentType<T>) {
     return (
       <div className="relative">
         <motion.div
-          style={{ perspective: "1200px" }}
+          style={{
+            perspective: "1200px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
           whileHover={{ scale: 1.02 }}
           transition={spring}
           ref={ref}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseEnd}
+
           // className="hover:shadow-2xl transition-shadow duration-300"
         >
           <motion.div
@@ -76,6 +82,9 @@ export function withFlip<T extends object>(Component: ComponentType<T>) {
               transformStyle: "preserve-3d",
               rotateX: dx,
               rotateY: dy,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
             }}
           >
             <motion.div
@@ -84,6 +93,9 @@ export function withFlip<T extends object>(Component: ComponentType<T>) {
               style={{
                 transformStyle: "preserve-3d",
                 backfaceVisibility: "hidden",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
               <Component {...props} side="front" />
