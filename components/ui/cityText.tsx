@@ -25,10 +25,10 @@ export default function CityText({ city, transport, index }: CityTextProps) {
           transition={{ opacity: { duration: 0.2 } }}
           className="flex flex-col items-center px-4 text-center"
         >
-          <h1 className="font-inter text-[#181D27] text-xl font-bold tracking-[-0.04em] mb-1">
+          <h1 className="font-inter text-[#181D27] dark:text-gray-100 text-xl font-bold tracking-[-0.04em] mb-1">
             {city}
           </h1>
-          <h2 className="font-inter font-medium text-[#535862] text-lg tracking-[-0.03em]">
+          <h2 className="font-inter font-medium text-[#535862] dark:text-gray-300 text-lg tracking-[-0.03em]">
             {transport}
           </h2>
         </motion.div>
