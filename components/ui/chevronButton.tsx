@@ -16,15 +16,12 @@ const Button = ({
   ...props
 }: ButtonProps) => {
   const baseStyles = `
-    w-9 h-9                                     
-    bg-white dark:bg-gray-800                    
-    rounded-full                 
-    border border-gray-200 dark:border-gray-600       
-    inline-flex                  
-    items-center                 
-    justify-center               
-    transition-all duration-200                  
-    transition-colors
+    w-9 h-9
+    bg-white dark:bg-gray-800
+    rounded-full
+    border border-gray-200 dark:border-gray-600
+    inline-flex items-center justify-center
+    transition-transform transition-colors duration-300 ease-in-out
     hover:bg-gray-50 dark:hover:bg-gray-700
     active:scale-95
     shadow-xsSkeumorphic
