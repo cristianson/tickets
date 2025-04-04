@@ -10,15 +10,16 @@ export default function FlipButton({
   const baseStyles = `
     h-9
     px-3
-    bg-white
+    bg-white dark:bg-gray-800
     rounded-xl
-    border border-gray-200
+    border border-gray-200 dark:border-gray-600
     inline-flex
     gap-1.5
     items-center
     justify-center
     transition-all duration-200
-    hover:bg-gray-50
+    transition-colors
+    hover:bg-gray-50 dark:hover:bg-gray-700
     active:scale-95
     shadow-xsSkeumorphic
   `;
@@ -26,7 +27,7 @@ export default function FlipButton({
   return (
     <button
       onClick={onClick}
-      className={`${baseStyles} ${className} text-gray-600`}
+      className={`${baseStyles} ${className} text-gray-600 dark:text-gray-100 transition-colors duration-200`}
     >
       <span className="text-sm font-medium">Flip ticket</span>
       <svg
