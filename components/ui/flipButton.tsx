@@ -13,12 +13,8 @@ export default function FlipButton({
     bg-white dark:bg-gray-800
     rounded-xl
     border border-gray-200 dark:border-gray-600
-    inline-flex
-    gap-1.5
-    items-center
-    justify-center
-    transition-all duration-200
-    transition-colors
+    inline-flex gap-1.5 items-center justify-center
+    transition-transform transition-colors duration-300 ease-in-out
     hover:bg-gray-50 dark:hover:bg-gray-700
     active:scale-95
     shadow-xsSkeumorphic
