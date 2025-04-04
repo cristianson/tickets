@@ -5,7 +5,10 @@ export type CityData = {
     front: string;
     back: string;
   };
-  backgroundImage: string;
+  backgroundImage: {
+    light: string;
+    dark: string;
+  };
 };
 
 const Cities: CityData[] = [
@@ -16,7 +19,10 @@ const Cities: CityData[] = [
       front: "/tickets/warsaw/warsaw_front.webp",
       back: "/tickets/warsaw/warsaw_back.webp",
     },
-    backgroundImage: "/maps/bg_warsaw.webp",
+    backgroundImage: {
+      light: "/maps/light/bg_warsaw.webp",
+      dark: "/maps/dark/bg_warsaw.webp",
+    },
   },
   {
     city: "Amsterdam, Netherlands",
@@ -25,7 +31,10 @@ const Cities: CityData[] = [
       front: "/tickets/amsterdam/amsterdam_front.webp",
       back: "/tickets/amsterdam/amsterdam_back.webp",
     },
-    backgroundImage: "/maps/bg_amsterdam.webp",
+    backgroundImage: {
+      light: "/maps/light/bg_amsterdam.webp",
+      dark: "/maps/dark/bg_amsterdam.webp",
+    },
   },
   {
     city: "Berlin, Germany",
@@ -34,7 +43,10 @@ const Cities: CityData[] = [
       front: "/tickets/berlin/berlin_front.webp",
       back: "/tickets/berlin/berlin_back.webp",
     },
-    backgroundImage: "/maps/bg_berlin.webp",
+    backgroundImage: {
+      light: "/maps/light/bg_berlin.webp",
+      dark: "/maps/dark/bg_berlin.webp",
+    },
   },
   {
     city: "Cluj-Napoca, Romania",
@@ -43,7 +55,10 @@ const Cities: CityData[] = [
       front: "/tickets/cluj/cluj_front.webp",
       back: "/tickets/cluj/cluj_back.webp",
     },
-    backgroundImage: "/maps/bg_cluj.webp",
+    backgroundImage: {
+      light: "/maps/light/bg_cluj.webp",
+      dark: "/maps/dark/bg_cluj.webp",
+    },
   },
   {
     city: "Hamburg, Germany",
@@ -52,7 +67,10 @@ const Cities: CityData[] = [
       front: "/tickets/hamburg/hamburg_front.webp",
       back: "/tickets/hamburg/hamburg_back.webp",
     },
-    backgroundImage: "/maps/bg_hamburg.webp",
+    backgroundImage: {
+      light: "/maps/light/bg_hamburg.webp",
+      dark: "/maps/dark/bg_hamburg.webp",
+    },
   },
   {
     city: "Munich, Germany",
@@ -61,7 +79,10 @@ const Cities: CityData[] = [
       front: "/tickets/munich/munich_front.webp",
       back: "/tickets/munich/munich_back.webp",
     },
-    backgroundImage: "/maps/bg_munich.webp",
+    backgroundImage: {
+      light: "/maps/light/bg_munich.webp",
+      dark: "/maps/dark/bg_munich.webp",
+    },
   },
 ] as const;
 
