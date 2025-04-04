@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 type FlipButtonProps = {
   onClick: () => void;
   className?: string;
@@ -14,16 +16,23 @@ export default function FlipButton({
     rounded-xl
     border border-gray-200 dark:border-gray-600
     inline-flex gap-1.5 items-center justify-center
-    transition-transform transition-colors duration-300 ease-in-out
     hover:bg-gray-50 dark:hover:bg-gray-700
     active:scale-95
     shadow-xsSkeumorphic
   `;
 
+  const transitionStyles =
+    "transition-transform transition-colors duration-300 ease-in-out";
+
   return (
     <button
       onClick={onClick}
-      className={`${baseStyles} ${className} text-gray-600 dark:text-gray-100 transition-colors duration-200`}
+      className={cn(
+        baseStyles,
+        transitionStyles,
+        "text-gray-600 dark:text-gray-100",
+        className
+      )}
     >
       <span className="text-sm font-medium">Flip ticket</span>
       <svg
