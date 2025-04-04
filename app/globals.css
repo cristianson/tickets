@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply bg-white text-black;
+    /* Add dark mode base styles */
+    @apply dark:bg-gray-900 dark:text-gray-100;
+    /* Add transition for color properties */
+    @apply transition-colors duration-300 ease-in-out;
+  }
+  /* You can add more base dark styles here if needed */
+}
+
+/* Remove default browser styles (optional but common) */
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-rgb: 255, 255, 255;
