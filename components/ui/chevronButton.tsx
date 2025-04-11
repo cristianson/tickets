@@ -1,6 +1,7 @@
 import { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { commonButtonStyles } from "@/lib/utils";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   position?: "left" | "right";
@@ -15,20 +16,14 @@ const Button = ({
   variant,
   ...props
 }: ButtonProps) => {
-  const baseStyles = `
-    w-9 h-9
-    bg-white dark:bg-gray-800
-    rounded-full
-    border border-gray-200 dark:border-gray-600
-    inline-flex items-center justify-center
-    transition-transform transition-colors duration-300 ease-in-out
-    hover:bg-gray-50 dark:hover:bg-gray-700
-    active:scale-95
-    shadow-xsSkeumorphic
-  `;
+  const specificStyles =
+    "w-9 h-9 rounded-full inline-flex items-center justify-center";
 
   return (
-    <button className={cn(baseStyles, className)} {...props}>
+    <button
+      className={cn(commonButtonStyles, specificStyles, className)}
+      {...props}
+    >
       <div className="flex items-center justify-center w-[34px] h-[34px] text-gray-600 dark:text-gray-100 transition-colors duration-200">
         {variant === "previous" && <ChevronLeft className="h-5 w-5" />}
         {variant === "next" && <ChevronRight className="h-5 w-5" />}
