@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import { FiMoon } from "react-icons/fi";
 import { cn, commonButtonStyles } from "@/lib/utils";
 
 export const ThemeToggleButton = () => {
@@ -32,7 +31,7 @@ export const ThemeToggleButton = () => {
       aria-label="Toggle Dark Mode"
       type="button"
       className={cn(
-        commonButtonStyles,
+        commonButtonStyles, // Use the imported constant again
         "fixed top-4 right-4 z-50 p-2 rounded-full", // Specific layout and shape
         "transition-transform duration-300 ease-in-out transform hover:rotate-90" // Unique hover animation
       )}
