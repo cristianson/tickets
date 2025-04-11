@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { FiMoon } from "react-icons/fi";
+import { cn, commonButtonStyles } from "@/lib/utils";
 
 export const ThemeToggleButton = () => {
   const [mounted, setMounted] = useState(false);
@@ -30,7 +31,11 @@ export const ThemeToggleButton = () => {
     <button
       aria-label="Toggle Dark Mode"
       type="button"
-      className="fixed top-4 right-4 z-50 p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 transition-transform duration-500 ease-in-out transform hover:rotate-90"
+      className={cn(
+        commonButtonStyles,
+        "fixed top-4 right-4 z-50 p-2 rounded-full", // Specific layout and shape
+        "transition-transform duration-300 ease-in-out transform hover:rotate-90" // Unique hover animation
+      )}
       onClick={toggleTheme}
     >
       {currentTheme === "dark" ? (
@@ -90,7 +95,7 @@ export const ThemeToggleButton = () => {
         >
           <path
             d="M6.8002 1.80907C6.92881 1.52469 6.86785 1.19039 6.64716 0.969692C6.42647 0.748998 6.09216 0.688047 5.80779 0.816654C2.8267 2.16482 0.75 5.16573 0.75 8.65329C0.75 13.4011 4.59889 17.25 9.34673 17.25C12.8343 17.25 15.8352 15.1733 17.1834 12.1922C17.312 11.9079 17.251 11.5736 17.0303 11.3529C16.8096 11.1322 16.4753 11.0712 16.191 11.1998C15.3011 11.6023 14.3128 11.8267 13.2701 11.8267C9.35068 11.8267 6.17337 8.64934 6.17337 4.72992C6.17337 3.68721 6.39777 2.69893 6.8002 1.80907Z"
-            fill="#79716B"
+            fill="currentColor"
           />
         </svg>
       )}
