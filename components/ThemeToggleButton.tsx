@@ -26,6 +26,35 @@ export const ThemeToggleButton = () => {
     setTheme(currentTheme === "dark" ? "light" : "dark");
   };
 
+  // Define the reusable inset shadow filter
+  const insetShadowFilter = (
+    <filter id="inset-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feOffset dx="0" dy="1.2" in="SourceAlpha" result="offset_shadow" />
+      <feGaussianBlur
+        stdDeviation="0.3"
+        in="offset_shadow"
+        result="blur_shadow"
+      />
+      <feComposite
+        operator="out"
+        in="SourceGraphic"
+        in2="blur_shadow"
+        result="inverse_shadow"
+      />
+      <feFlood floodColor="black" floodOpacity="0.5" result="shadow_color" />
+      <feComposite
+        operator="in"
+        in="shadow_color"
+        in2="inverse_shadow"
+        result="final_inset_shadow"
+      />
+      <feMerge>
+        <feMergeNode in="SourceGraphic" />
+        <feMergeNode in="final_inset_shadow" />
+      </feMerge>
+    </filter>
+  );
+
   return (
     <button
       aria-label="Toggle Dark Mode"
@@ -46,43 +75,7 @@ export const ThemeToggleButton = () => {
           fill="none"
           className="w-6 h-6"
         >
-          <defs>
-            <filter
-              id="inset-shadow"
-              x="-50%"
-              y="-50%"
-              width="200%"
-              height="200%"
-            >
-              <feOffset dx="0" dy="1" in="SourceAlpha" result="offset_shadow" />
-              <feGaussianBlur
-                stdDeviation="0.5"
-                in="offset_shadow"
-                result="blur_shadow"
-              />
-              <feComposite
-                operator="out"
-                in="SourceGraphic"
-                in2="blur_shadow"
-                result="inverse_shadow"
-              />
-              <feFlood
-                floodColor="black"
-                floodOpacity="0.25"
-                result="shadow_color"
-              />
-              <feComposite
-                operator="in"
-                in="shadow_color"
-                in2="inverse_shadow"
-                result="final_inset_shadow"
-              />
-              <feMerge>
-                <feMergeNode in="SourceGraphic" />
-                <feMergeNode in="final_inset_shadow" />
-              </feMerge>
-            </filter>
-          </defs>
+          <defs>{insetShadowFilter}</defs>
           <path
             filter="url(#inset-shadow)"
             d="M13 2C13 1.44772 12.5523 1 12 1C11.4477 1 11 1.44772 11 2V4C11 4.55228 11.4477 5 12 5C12.5523 5 13 4.55228 13 4V2Z"
@@ -138,43 +131,7 @@ export const ThemeToggleButton = () => {
           fill="none"
           className="w-6 h-6"
         >
-          <defs>
-            <filter
-              id="inset-shadow"
-              x="-50%"
-              y="-50%"
-              width="200%"
-              height="200%"
-            >
-              <feOffset dx="0" dy="1" in="SourceAlpha" result="offset_shadow" />
-              <feGaussianBlur
-                stdDeviation="0.5"
-                in="offset_shadow"
-                result="blur_shadow"
-              />
-              <feComposite
-                operator="out"
-                in="SourceGraphic"
-                in2="blur_shadow"
-                result="inverse_shadow"
-              />
-              <feFlood
-                floodColor="black"
-                floodOpacity="0.25"
-                result="shadow_color"
-              />
-              <feComposite
-                operator="in"
-                in="shadow_color"
-                in2="inverse_shadow"
-                result="final_inset_shadow"
-              />
-              <feMerge>
-                <feMergeNode in="SourceGraphic" />
-                <feMergeNode in="final_inset_shadow" />
-              </feMerge>
-            </filter>
-          </defs>
+          <defs>{insetShadowFilter}</defs>
           <path
             filter="url(#inset-shadow)"
             d="M6.8002 1.80907C6.92881 1.52469 6.86785 1.19039 6.64716 0.969692C6.42647 0.748998 6.09216 0.688047 5.80779 0.816654C2.8267 2.16482 0.75 5.16573 0.75 8.65329C0.75 13.4011 4.59889 17.25 9.34673 17.25C12.8343 17.25 15.8352 15.1733 17.1834 12.1922C17.312 11.9079 17.251 11.5736 17.0303 11.3529C16.8096 11.1322 16.4753 11.0712 16.191 11.1998C15.3011 11.6023 14.3128 11.8267 13.2701 11.8267C9.35068 11.8267 6.17337 8.64934 6.17337 4.72992C6.17337 3.68721 6.39777 2.69893 6.8002 1.80907Z"
