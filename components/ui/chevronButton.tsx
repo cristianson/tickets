@@ -23,7 +23,7 @@ const Button = ({
       className={cn(commonButtonStyles, specificStyles, className)}
       {...props}
     >
-      <div className="flex items-center justify-center w-[34px] h-[34px] text-gray-600 dark:text-gray-100 transition-colors duration-200">
+      <div className="flex items-center justify-center w-[34px] h-[34px]">
         {variant === "previous" && (
           <svg
             xmlns="http://www.w3.org/2000/svg"
