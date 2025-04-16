@@ -49,7 +49,7 @@ const Cities: CityData[] = [
     },
   },
   {
-    city: "Cluj-Napoca, Romania",
+    city: "-Napoca, Romania",
     transport: "Bus",
     ticketImage: {
       front: "/tickets/cluj/cluj_front.webp",
