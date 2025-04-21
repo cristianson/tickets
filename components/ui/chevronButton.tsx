@@ -20,7 +20,12 @@ const Button = ({
 
   return (
     <button
-      className={cn(commonButtonStyles, specificStyles, className)}
+      className={cn(
+        commonButtonStyles,
+        specificStyles,
+        "transition-background duration-300 ease-in-out",
+        className
+      )}
       {...props}
     >
       <div className="flex items-center justify-center w-[34px] h-[34px]">
