@@ -20,8 +20,8 @@ const Cities: CityData[] = [
       back: "/tickets/warsaw/warsaw_back.webp",
     },
     backgroundImage: {
-      light: "/maps/light/bg_warsaw.webp",
-      dark: "/maps/dark/bg_warsaw.webp",
+      light: "/maps/light/light.png",
+      dark: "/maps/dark/dark.png",
     },
   },
   {
