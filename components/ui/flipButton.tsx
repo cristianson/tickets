@@ -16,7 +16,12 @@ export default function FlipButton({
   return (
     <button
       onClick={onClick}
-      className={cn(commonButtonStyles, specificStyles, className)}
+      className={cn(
+        commonButtonStyles,
+        specificStyles,
+        "transition-background duration-300 ease-in-out",
+        className
+      )}
     >
       <span className="text-sm font-medium">Flip ticket</span>
       <svg
