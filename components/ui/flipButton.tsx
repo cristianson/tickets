@@ -19,7 +19,7 @@ export default function FlipButton({
       className={cn(
         commonButtonStyles,
         specificStyles,
-        "transition-background duration-300 ease-in-out",
+        "transition-colors duration-200 ease-linear",
         className
       )}
     >
