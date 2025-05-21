@@ -78,6 +78,7 @@ export default function ImageGallery() {
           <FlipButton
             onClick={() => toggleFlipRef.current?.()}
             className="bottom-4 right-4"
+  aria-label="Flip ticket" // ADD THIS LINE
           />
         </div>
       </div>
