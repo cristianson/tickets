@@ -41,10 +41,10 @@ const TicketImage = ({ ticketImage, cityName, side = "front" }: ImageProps) => (
   <Image
     src={side === "front" ? ticketImage.front : ticketImage.back}
     alt={`${cityName} transport ticket ${side}`}
-    width={350}
-    height={0}
+    width={350} // Keep width, next/image might use it for initial sizing or aspect ratio calculation before styles apply
+    // height={0} // REMOVE THIS LINE
     style={{
-      maxHeight: "450px", //Max height of the ticket image
+      maxHeight: "450px",
       width: "auto",
       height: "auto",
       objectFit: "contain",
