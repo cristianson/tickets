@@ -98,7 +98,7 @@ const Cities: CityData[] = [
   },
   {
     city: "Bucharest, Romania",
-    transport: "Bus",
+    transport: "All public transport",
     ticketImage: {
       front: "/tickets/bucharest/bucharest_front.webp",
       back: "/tickets/bucharest/bucharest_back.webp",
