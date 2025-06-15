@@ -84,6 +84,30 @@ const Cities: CityData[] = [
       dark: "/maps/dark/bg_munich.webp",
     },
   },
+  {
+    city: "Funchal Madeira, Portugal",
+    transport: "Bus",
+    ticketImage: {
+      front: "/tickets/funchal/funchal_front.webp",
+      back: "/tickets/funchal/funchal_back.webp",
+    },
+    backgroundImage: {
+      light: "/maps/light/bg_funchal.webp",
+      dark: "/maps/dark/bg_funchal.webp",
+    },
+  },
+  {
+    city: "Bucharest, Romania",
+    transport: "Bus",
+    ticketImage: {
+      front: "/tickets/bucharest/bucharest_front.webp",
+      back: "/tickets/bucharest/bucharest_back.webp",
+    },
+    backgroundImage: {
+      light: "/maps/light/bg_bucharest.webp",
+      dark: "/maps/dark/bg_bucharest.webp",
+    },
+  },
 ] as const;
 
 export default Cities;
