@@ -1,4 +1,4 @@
-# Train Ticket Gallery
+# Public Transport Ticket Gallery
 
 A small web app that shows real tickets from trains and buses in different cities. You can flip each ticket to see the front and back and switch between light and dark themes.
 
