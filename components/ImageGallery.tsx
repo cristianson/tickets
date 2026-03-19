@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import Button from "./ui/chevronButton";
 import FlipButton from "./ui/flipButton";
 import Cities from "@/lib/cityData";
@@ -12,6 +12,20 @@ export default function ImageGallery() {
   const [direction, setDirection] = useState(0);
   const toggleFlipRef = useRef<() => void>();
   const currentCity = useMemo(() => Cities[currentIndex], [currentIndex]);
+
+  useEffect(() => {
+    Cities.forEach((city) => {
+      [
+        city.ticketImage.front,
+        city.ticketImage.back,
+        city.backgroundImage.light,
+        city.backgroundImage.dark,
+      ].forEach((src) => {
+        const img = new window.Image();
+        img.src = src;
+      });
+    });
+  }, []);
 
   const goToPrevious = () => {
     setDirection(-1);
