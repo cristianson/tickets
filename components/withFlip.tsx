@@ -74,8 +74,6 @@ export function withFlip<T extends object>(Component: ComponentType<T>) {
           ref={ref}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseEnd}
-
-          // className="hover:shadow-2xl transition-shadow duration-300"
         >
           <motion.div
             style={{

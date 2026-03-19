@@ -3,14 +3,12 @@ import { cn } from "@/lib/utils";
 import { commonButtonStyles } from "@/lib/utils";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  position?: "left" | "right";
   isMobile?: boolean;
   variant?: "next" | "previous";
 }
 
 const Button = ({
   className,
-  position,
   isMobile = false,
   variant,
   ...props
