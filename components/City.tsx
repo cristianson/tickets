@@ -84,12 +84,10 @@ function Ticket({ city, isFirst, isFlipped, onFlip }: TicketProps) {
   );
 }
 
-// Maps are the largest visible element (the LCP), so they load eagerly
-// instead of waiting for the lazy-loading heuristics. On phones the map
-// covers the whole ticket stage and fades out at the sides (see globals.css);
-// on larger screens it is shown whole.
+// On phones the map covers the whole ticket stage and fades out at the sides
+// (see globals.css); on larger screens it is shown whole.
 const mapClassName =
-  "map-fade-x pointer-events-none select-none object-cover transition-opacity duration-300 ease-in-out sm:object-contain";
+  "map-fade-x pointer-events-none select-none object-cover sm:object-contain";
 
 type Props = {
   city: CityData;
@@ -110,10 +108,16 @@ export default function City({ city, direction, index, isFlipped, onSwipe, onFli
 
   return (
     <div className="relative flex min-h-[300px] w-full max-w-[902px] flex-col items-center justify-center self-stretch overflow-hidden sm:min-h-[540px] sm:self-auto">
-      {/* Both theme maps are rendered and cross-faded with CSS, so the correct
-          one shows on first paint (no wait for hydration) and theme toggles
-          animate without JavaScript. Keyed by city so a slow-loading map
-          never leaves the previous city's map on screen. */}
+      {/* Both theme maps are in the page, and CSS shows the one for the
+          current theme, so the right map is there on first paint (the theme
+          class is set before the page renders). The hidden one is
+          display:none and lazy, so the browser doesn't download it: only the
+          visible map competes with the ticket. The visible one is the LCP
+          element, hence high priority. ImageGallery preloads the other
+          theme's map when idle so a theme switch is instant, and the switch
+          itself is cross-faded by ThemeToggleButton.
+          Keyed by city so a slow-loading map never leaves the previous
+          city's map on screen. */}
       <Image
         key={`${city.city}-light`}
         src={city.backgroundImage.light}
@@ -121,8 +125,9 @@ export default function City({ city, direction, index, isFlipped, onSwipe, onFli
         fill
         sizes={MAP_SIZES}
         quality={MAP_QUALITY}
-        loading="eager"
-        className={`${mapClassName} opacity-100 dark:opacity-0`}
+        loading="lazy"
+        fetchPriority="high"
+        className={`${mapClassName} dark:hidden`}
       />
       <Image
         key={`${city.city}-dark`}
@@ -131,8 +136,9 @@ export default function City({ city, direction, index, isFlipped, onSwipe, onFli
         fill
         sizes={MAP_SIZES}
         quality={MAP_QUALITY}
-        loading="eager"
-        className={`${mapClassName} opacity-0 dark:opacity-100`}
+        loading="lazy"
+        fetchPriority="high"
+        className={`${mapClassName} hidden dark:block`}
       />
 
       {/* The ticket column fills the full height so a swipe anywhere on it

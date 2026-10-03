@@ -14,9 +14,10 @@ import sharp from "sharp";
 const ROOT = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "assets");
 const force = process.argv.includes("--force");
 
-// 2x the largest rendered size, rounded up to a next/image device size.
+// Tickets: 2x the largest rendered size. Maps: on phones they cover a tall
+// stage and are drawn up to ~1200px wide on 3x screens, so keep up to 3840px.
 const PRESETS = {
-  maps: { maxWidth: 1920, maxHeight: 1920, quality: 70, alphaQuality: 80 },
+  maps: { maxWidth: 3840, maxHeight: 3840, quality: 80, alphaQuality: 90 },
   tickets: { maxWidth: 1400, maxHeight: 1400, quality: 80, alphaQuality: 90 },
 };
 

@@ -6,7 +6,7 @@ import { useTheme } from "next-themes";
 import ChevronButton from "./ui/chevronButton";
 import FlipButton from "./ui/flipButton";
 import Cities from "@/lib/cityData";
-import { preloadCity } from "@/lib/images";
+import { preloadCity, preloadMap } from "@/lib/images";
 import City from "./City";
 import CityText from "./ui/cityText";
 
@@ -37,6 +37,8 @@ export default function ImageGallery() {
     const run = () => {
       preloadCity(Cities[wrap(currentIndex + 1)], theme);
       preloadCity(Cities[wrap(currentIndex - 1)], theme);
+      // The other theme's map isn't downloaded with the page (it's hidden).
+      preloadMap(Cities[currentIndex], theme === "dark" ? "light" : "dark");
     };
     // Safari has no requestIdleCallback; fall back to a short timeout there.
     if (typeof window.requestIdleCallback === "function") {
