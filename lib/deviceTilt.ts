@@ -89,10 +89,6 @@ const GYRO_RANGE = MAX_TILT / GYRO_GAIN;
 // instead of starting flat.
 export const gyroTilt = { x: motionValue(0), y: motionValue(0) };
 
-// The current tilt of the ticket on screen (from the gyroscope or the mouse),
-// for effects outside the card such as the map parallax.
-export const cardTilt = { x: motionValue(0), y: motionValue(0) };
-
 let listening = false;
 
 // Starts listening to the gyroscope (once per page). The resting position is
