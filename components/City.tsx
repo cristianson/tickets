@@ -10,6 +10,16 @@ import FlipCard from "./FlipCard";
 
 const ANIMATION_OFFSET = 350;
 
+// Changing city: the old map fades out while the new one fades in, both
+// drifting a little in the direction the ticket slides, so the map and ticket
+// move as one. Runs alongside the ticket's exit and entrance (~0.45s in total).
+const MAP_DRIFT = 40; // px
+const mapVariants = {
+  enter: (direction: number) => ({ opacity: 0, x: direction * MAP_DRIFT }),
+  center: { opacity: 1, x: 0 },
+  exit: (direction: number) => ({ opacity: 0, x: -direction * MAP_DRIFT }),
+};
+
 // A swipe counts once the finger has travelled this far, or flicked this fast.
 const SWIPE_DISTANCE = 80; // px
 const SWIPE_VELOCITY = 400; // px/s
@@ -24,10 +34,14 @@ const slideVariants = {
     x: 0,
     opacity: 1,
   },
+  // A quick, eased exit: with mode="wait" the next ticket only enters once the
+  // exit has finished, and the spring used for entering took ~450ms to settle
+  // while the ticket was already invisible, leaving a gap with no ticket.
   exit: (direction: number) => ({
     zIndex: 0,
     x: direction < 0 ? ANIMATION_OFFSET : -ANIMATION_OFFSET,
     opacity: 0,
+    transition: { x: { duration: 0.2, ease: "easeIn" as const }, opacity: { duration: 0.15 } },
   }),
 };
 
@@ -147,10 +161,23 @@ export default function City({ city, direction, index, isFlipped, onSwipe, onFli
           the right map is there on first paint (the theme class is set before
           the page renders). ImageGallery preloads the other theme's map when
           idle so a theme switch is instant; the switch itself is cross-faded
-          by ThemeToggleButton. Keyed by city so a slow-loading map never
-          leaves the previous city's map on screen. */}
-      <CityMap key={`${city.city}-light`} city={city} theme="light" />
-      <CityMap key={`${city.city}-dark`} city={city} theme="dark" />
+          by ThemeToggleButton. Keyed by city, so changing city cross-fades
+          from the old map to the new one (mapVariants above). */}
+      <AnimatePresence initial={false} custom={direction}>
+        <motion.div
+          key={city.city}
+          custom={direction}
+          variants={mapVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+          className="pointer-events-none absolute inset-0"
+        >
+          <CityMap city={city} theme="light" />
+          <CityMap city={city} theme="dark" />
+        </motion.div>
+      </AnimatePresence>
 
       {/* The ticket column fills the full height so a swipe anywhere on it
           (not only on the ticket itself) changes city. */}
