@@ -2,7 +2,7 @@
 
 import { useEffect, type MouseEvent, type ReactNode } from "react";
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
-import { screenTilt, useTiltPermission } from "@/lib/deviceTilt";
+import { gyroTilt, MAX_TILT, startGyroTilt, useTiltPermission } from "@/lib/deviceTilt";
 import { TOUCH_DEVICE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 
 const spring = {
@@ -10,16 +10,6 @@ const spring = {
   stiffness: 300,
   damping: 40,
 } as const;
-
-// Maximum tilt in degrees when the pointer is at the card's edge.
-const MAX_TILT = 10;
-// Card degrees per degree the phone is tilted away from its resting position.
-const GYRO_GAIN = 0.6;
-// How quickly the resting position follows the phone (per event, ~60/s), so
-// the card re-centres after the user changes how they hold it.
-const GYRO_RECENTER = 0.01;
-
-const clampTilt = (deg: number) => Math.max(-MAX_TILT, Math.min(MAX_TILT, deg));
 
 type Props = {
   front: ReactNode;
@@ -55,21 +45,18 @@ export default function FlipCard({ front, back, isFlipped, onFlip }: Props) {
 
   // On phones, tilt the card with the device's gyroscope instead of the mouse.
   // On iOS this only starts once the user has enabled it (see TiltButton).
+  // The gyro tilt is shared across the page (see lib/deviceTilt.ts), so a new
+  // ticket starts at the current tilt rather than flat.
   useEffect(() => {
     if (!isTouchDevice || reduceMotion || !gyroAvailable) return;
-    let rest: { x: number; y: number } | null = null;
-    const onOrientation = (event: DeviceOrientationEvent) => {
-      const tilt = screenTilt(event);
-      if (!tilt) return;
-      rest ??= tilt;
-      rest.x += (tilt.x - rest.x) * GYRO_RECENTER;
-      rest.y += (tilt.y - rest.y) * GYRO_RECENTER;
-      rotateX.set(clampTilt(-(tilt.x - rest.x) * GYRO_GAIN));
-      rotateY.set(clampTilt((tilt.y - rest.y) * GYRO_GAIN));
-    };
-    window.addEventListener("deviceorientation", onOrientation);
+    startGyroTilt();
+    rotateX.jump(gyroTilt.x.get());
+    rotateY.jump(gyroTilt.y.get());
+    const unsubscribeX = gyroTilt.x.on("change", (deg) => rotateX.set(deg));
+    const unsubscribeY = gyroTilt.y.on("change", (deg) => rotateY.set(deg));
     return () => {
-      window.removeEventListener("deviceorientation", onOrientation);
+      unsubscribeX();
+      unsubscribeY();
       rotateX.set(0);
       rotateY.set(0);
     };

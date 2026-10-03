@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { motionValue } from "framer-motion";
 
 // iOS Safari (13+) only delivers `deviceorientation` events after the page asks
 // for permission, and that request must come from a user gesture (a tap).
@@ -74,9 +75,45 @@ export async function requestTiltPermission() {
   }
 }
 
+// Maximum card tilt in degrees (shared with the desktop mouse tilt).
+export const MAX_TILT = 10;
+// Card degrees per degree the phone is tilted away from its resting position.
+const GYRO_GAIN = 0.6;
+// How far (in phone degrees) the phone can move from the resting position
+// before the card is at MAX_TILT.
+const GYRO_RANGE = MAX_TILT / GYRO_GAIN;
+
+// The card tilt from the gyroscope, shared by every ticket on the page. It lives
+// outside the components so it survives anything that re-renders or replaces
+// them (changing city, switching theme): a ticket picks up the current tilt
+// instead of starting flat.
+export const gyroTilt = { x: motionValue(0), y: motionValue(0) };
+
+let listening = false;
+
+// Starts listening to the gyroscope (once per page). The resting position is
+// how the phone was held when tilt started; holding the phone still keeps the
+// card where it is. If the phone moves further than the card can follow (e.g.
+// the user lies down), the resting position is dragged along, so the card stays
+// responsive instead of getting stuck at its maximum tilt.
+export function startGyroTilt() {
+  if (listening) return;
+  listening = true;
+  let rest: { x: number; y: number } | null = null;
+  const follow = (value: number, restValue: number) =>
+    Math.min(Math.max(restValue, value - GYRO_RANGE), value + GYRO_RANGE);
+  window.addEventListener("deviceorientation", (event) => {
+    const tilt = screenTilt(event);
+    if (!tilt) return;
+    rest = rest ? { x: follow(tilt.x, rest.x), y: follow(tilt.y, rest.y) } : tilt;
+    gyroTilt.x.set(-(tilt.x - rest.x) * GYRO_GAIN);
+    gyroTilt.y.set((tilt.y - rest.y) * GYRO_GAIN);
+  });
+}
+
 // Converts an orientation event to tilt around the screen's horizontal (x) and
 // vertical (y) axes, accounting for the screen being rotated to landscape.
-export function screenTilt(event: DeviceOrientationEvent): { x: number; y: number } | null {
+function screenTilt(event: DeviceOrientationEvent): { x: number; y: number } | null {
   const { beta, gamma } = event;
   if (beta === null || gamma === null) return null;
   switch (screen.orientation?.angle ?? 0) {
