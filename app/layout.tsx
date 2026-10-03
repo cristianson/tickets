@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "next-themes";
 import { Inter } from "next/font/google";
 import { ThemeToggleButton } from "@/components/ThemeToggleButton";
+import TiltButton from "@/components/ui/tiltButton";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <TiltButton />
           <ThemeToggleButton />
           {children}
         </ThemeProvider>

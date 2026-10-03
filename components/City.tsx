@@ -102,7 +102,7 @@ export default function City({ city, direction, index, isFlipped, onSwipe }: Pro
   };
 
   return (
-    <div className="relative flex min-h-[540px] w-full max-w-[902px] flex-col items-center justify-center overflow-hidden">
+    <div className="relative flex min-h-[470px] w-full max-w-[902px] sm:min-h-[540px] flex-col items-center justify-center overflow-hidden">
       {/* Both theme maps are rendered and cross-faded with CSS, so the correct
           one shows on first paint (no wait for hydration) and theme toggles
           animate without JavaScript. Keyed by city so a slow-loading map

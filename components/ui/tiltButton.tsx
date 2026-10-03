@@ -8,7 +8,8 @@ import { TOUCH_DEVICE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 // Shown only on phones whose browser requires permission for motion sensors
 // (iOS). Tapping it shows the system "Motion & Orientation" prompt; once the
 // user answers, the button goes away. Android tilts without asking.
-export default function TiltButton({ className }: { className?: string }) {
+// Sits in the top-left corner, mirroring the theme toggle on the right.
+export default function TiltButton() {
   const permission = useTiltPermission();
   const isTouchDevice = useMediaQuery(TOUCH_DEVICE_QUERY);
   const visible = isTouchDevice && permission === "prompt";
@@ -25,8 +26,8 @@ export default function TiltButton({ className }: { className?: string }) {
           transition={{ duration: 0.2 }}
           className={cn(
             commonButtonStyles,
-            "inline-flex h-9 items-center justify-center gap-1.5 rounded-xl px-3",
-            className
+            // Same height as the round theme toggle (24px icon + p-2 + border).
+            "fixed left-4 top-4 z-50 inline-flex h-[42px] items-center justify-center gap-1.5 rounded-full px-4"
           )}
         >
           <span className="text-sm font-medium">Enable tilt</span>

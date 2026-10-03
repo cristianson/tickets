@@ -5,7 +5,6 @@ import { MotionConfig } from "framer-motion";
 import { useTheme } from "next-themes";
 import ChevronButton from "./ui/chevronButton";
 import FlipButton from "./ui/flipButton";
-import TiltButton from "./ui/tiltButton";
 import Cities from "@/lib/cityData";
 import { preloadCity } from "@/lib/images";
 import City from "./City";
@@ -60,7 +59,8 @@ export default function ImageGallery() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="flex min-h-screen flex-col items-center justify-center">
+      {/* On phones, leave room for the fixed top buttons (16px + 42px + 16px). */}
+      <div className="flex min-h-screen flex-col items-center justify-center pt-[74px] sm:pt-0">
         <CityText city={currentCity.city} transport={currentCity.transport} />
         <div className="flex w-full flex-row items-center justify-center gap-4 px-4 sm:px-12">
           <ChevronButton
@@ -84,15 +84,12 @@ export default function ImageGallery() {
           />
         </div>
         {/* Mobile Navigation */}
-        <div className="relative flex w-full max-w-[350px] items-center justify-between gap-8 px-3 sm:justify-center">
+        <div className="flex w-full max-w-[350px] items-center justify-between gap-8 px-3 sm:justify-center">
           <div className="flex flex-row items-center gap-4 sm:hidden">
             <ChevronButton onClick={goToPrevious} aria-label="Previous ticket" variant="previous" />
             <ChevronButton onClick={goToNext} aria-label="Next ticket" variant="next" />
           </div>
           <FlipButton onClick={toggleFlip} isFlipped={isFlipped} />
-          {/* Positioned out of flow so it appearing/disappearing after
-              hydration doesn't shift the layout. */}
-          <TiltButton className="absolute left-1/2 top-full mt-4 -translate-x-1/2" />
         </div>
       </div>
     </MotionConfig>
