@@ -1,16 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useTheme } from "next-themes";
-import { CityData } from "@/lib/cityData";
 import { AnimatePresence, motion } from "framer-motion";
-import { withFlip } from "./withFlip";
-
-const fadeVariants = {
-  enter: { opacity: 0 },
-  center: { opacity: 1 },
-  exit: { opacity: 0 },
-};
+import type { CityData } from "@/lib/cityData";
+import { MAP_SIZES, TICKET_SIZES } from "@/lib/images";
+import FlipCard from "./FlipCard";
 
 const ANIMATION_OFFSET = 350;
 
@@ -31,71 +25,63 @@ const slideVariants = {
   }),
 };
 
-type ImageProps = {
-  ticketImage: CityData["ticketImage"];
-  cityName: string;
-  side?: "front" | "back";
+type TicketImageProps = {
+  city: CityData;
+  side: "front" | "back";
+  isFirst: boolean;
 };
 
-const TicketImage = ({ ticketImage, cityName, side = "front" }: ImageProps) => (
-  <Image
-    src={side === "front" ? ticketImage.front : ticketImage.back}
-    alt={`${cityName} transport ticket ${side}`}
-    width={350}
-    height={0}
-    style={{
-      maxHeight: "450px", //Max height of the ticket image
-      width: "auto",
-      height: "auto",
-      objectFit: "contain",
-      maxWidth: "100%",
-    }}
-    priority
-  />
-);
+const TicketImage = ({ city, side, isFirst }: TicketImageProps) => {
+  // The first city's front face is the page's LCP element: fetch it right away.
+  const isLcp = isFirst && side === "front";
+  return (
+    <Image
+      src={city.ticketImage[side]}
+      alt={`${city.city} transport ticket ${side}`}
+      sizes={TICKET_SIZES}
+      placeholder="blur"
+      loading={isLcp ? "eager" : undefined}
+      fetchPriority={isLcp ? "high" : undefined}
+      className="h-auto max-h-[450px] w-auto max-w-full object-contain"
+    />
+  );
+};
 
-const FlippableTicket = withFlip(TicketImage);
+const mapClassName =
+  "pointer-events-none select-none object-contain transition-opacity duration-300 ease-in-out";
 
 type Props = {
   city: CityData;
   direction: number;
   index: number;
-  onToggleFlip?: (toggleFn: () => void) => void;
+  isFlipped: boolean;
 };
 
-export default function City({ city, direction, index, onToggleFlip }: Props) {
-  const { resolvedTheme } = useTheme();
-
-  const transition = { duration: 0.3, ease: "easeInOut" };
-
+export default function City({ city, direction, index, isFlipped }: Props) {
   return (
-    <div className="w-full flex flex-col items-center justify-center max-w-[902px] min-h-[540px] relative transition-colors duration-300 ease-in-out overflow-hidden">
-      {/* Light Background Image */}
-      <motion.div
-        className="absolute inset-0 z-0 bg-center bg-no-repeat bg-contain"
-        style={{
-          backgroundImage: `url(${city.backgroundImage.light})`,
-        }}
-        initial={false}
-        animate={{ opacity: resolvedTheme === "light" ? 1 : 0 }}
-        transition={transition}
+    <div className="relative flex min-h-[540px] w-full max-w-[902px] flex-col items-center justify-center overflow-hidden">
+      {/* Both theme maps are rendered and cross-faded with CSS, so the correct
+          one shows on first paint (no wait for hydration) and theme toggles
+          animate without JavaScript. Keyed by city so a slow-loading map
+          never leaves the previous city's map on screen. */}
+      <Image
+        key={`${city.city}-light`}
+        src={city.backgroundImage.light}
+        alt=""
+        fill
+        sizes={MAP_SIZES}
+        className={`${mapClassName} opacity-100 dark:opacity-0`}
       />
-      {/* Dark Background Image */}
-      <motion.div
-        className="absolute inset-0 z-0 bg-center bg-no-repeat bg-contain"
-        style={{
-          backgroundImage: `url(${city.backgroundImage.dark})`,
-        }}
-        initial={false}
-        animate={{ opacity: resolvedTheme === "dark" ? 1 : 0 }}
-        transition={transition}
+      <Image
+        key={`${city.city}-dark`}
+        src={city.backgroundImage.dark}
+        alt=""
+        fill
+        sizes={MAP_SIZES}
+        className={`${mapClassName} opacity-0 dark:opacity-100`}
       />
 
-      {/* Ticket Container */}
-      <div
-        className="w-full max-w-[350px] relative flex flex-col items-center justify-center z-20" // Above gradient
-        style={{ minHeight: 200, maxHeight: "760px", overflow: "visible" }}
-      >
+      <div className="relative z-20 flex max-h-[760px] min-h-[200px] w-full max-w-[350px] flex-col items-center justify-center">
         <AnimatePresence initial={false} custom={direction} mode="wait">
           <motion.div
             key={index}
@@ -108,12 +94,12 @@ export default function City({ city, direction, index, onToggleFlip }: Props) {
               x: { type: "spring", stiffness: 500, damping: 40 },
               opacity: { duration: 0.15 },
             }}
-            className="w-full top-0 left-0"
+            className="w-full"
           >
-            <FlippableTicket
-              ticketImage={city.ticketImage}
-              cityName={city.city}
-              onToggleFlip={onToggleFlip}
+            <FlipCard
+              isFlipped={isFlipped}
+              front={<TicketImage city={city} side="front" isFirst={index === 0} />}
+              back={<TicketImage city={city} side="back" isFirst={index === 0} />}
             />
           </motion.div>
         </AnimatePresence>

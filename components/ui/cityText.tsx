@@ -9,15 +9,15 @@ const fadeVariants = {
 type CityTextProps = {
   city: string;
   transport: string;
-  index: number;
 };
 
-export default function CityText({ city, transport, index }: CityTextProps) {
+export default function CityText({ city, transport }: CityTextProps) {
   return (
-    <div className="h-[72px] flex flex-col items-center justify-center">
+    // aria-live announces the new city to screen readers when navigating.
+    <div className="flex h-[72px] flex-col items-center justify-center" aria-live="polite">
       <AnimatePresence mode="wait">
         <motion.div
-          key={index + "-text"}
+          key={city}
           initial="enter"
           animate="center"
           exit="exit"
@@ -25,10 +25,10 @@ export default function CityText({ city, transport, index }: CityTextProps) {
           transition={{ opacity: { duration: 0.2 } }}
           className="flex flex-col items-center px-4 text-center"
         >
-          <h1 className="font-inter text-[#181D27] dark:text-gray-100 text-xl font-bold tracking-[-0.04em] mb-1">
+          <h1 className="mb-1 font-inter text-xl font-bold tracking-[-0.04em] text-gray-900 dark:text-gray-100">
             {city}
           </h1>
-          <h2 className="font-inter font-medium text-[#535862] dark:text-gray-300 text-lg tracking-[-0.03em]">
+          <h2 className="font-inter text-lg font-medium tracking-[-0.03em] text-gray-600 dark:text-gray-300">
             {transport}
           </h2>
         </motion.div>

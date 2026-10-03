@@ -1,25 +1,20 @@
-import { cn } from "@/lib/utils";
-import { commonButtonStyles } from "@/lib/utils";
+import { cn, commonButtonStyles } from "@/lib/utils";
 
 type FlipButtonProps = {
   onClick: () => void;
+  isFlipped: boolean;
   className?: string;
 };
 
-export default function FlipButton({
-  onClick,
-  className = "",
-}: FlipButtonProps) {
-  const specificStyles =
-    "h-9 px-3 rounded-xl inline-flex gap-1.5 items-center justify-center";
-
+export default function FlipButton({ onClick, isFlipped, className }: FlipButtonProps) {
   return (
     <button
+      type="button"
       onClick={onClick}
+      aria-pressed={isFlipped}
       className={cn(
         commonButtonStyles,
-        specificStyles,
-        "transition-colors duration-200 ease-linear",
+        "inline-flex h-9 items-center justify-center gap-1.5 rounded-xl px-3",
         className
       )}
     >
