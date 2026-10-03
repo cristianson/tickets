@@ -1,7 +1,9 @@
 "use client";
 
-import type { MouseEvent, ReactNode } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useEffect, type MouseEvent, type ReactNode } from "react";
+import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
+import { screenTilt } from "@/lib/deviceTilt";
+import { TOUCH_DEVICE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 
 const spring = {
   type: "spring",
@@ -11,6 +13,13 @@ const spring = {
 
 // Maximum tilt in degrees when the pointer is at the card's edge.
 const MAX_TILT = 10;
+// Card degrees per degree the phone is tilted away from its resting position.
+const GYRO_GAIN = 0.6;
+// How quickly the resting position follows the phone (per event, ~60/s), so
+// the card re-centres after the user changes how they hold it.
+const GYRO_RECENTER = 0.01;
+
+const clampTilt = (deg: number) => Math.max(-MAX_TILT, Math.min(MAX_TILT, deg));
 
 type Props = {
   front: ReactNode;
@@ -23,10 +32,33 @@ export default function FlipCard({ front, back, isFlipped }: Props) {
   // movement animates without re-rendering the component on every event.
   const rotateX = useSpring(useMotionValue(0), spring);
   const rotateY = useSpring(useMotionValue(0), spring);
+  const reduceMotion = useReducedMotion();
+  const isTouchDevice = useMediaQuery(TOUCH_DEVICE_QUERY);
+
+  // On phones, tilt the card with the device's gyroscope instead of the mouse.
+  useEffect(() => {
+    if (!isTouchDevice || reduceMotion) return;
+    let rest: { x: number; y: number } | null = null;
+    const onOrientation = (event: DeviceOrientationEvent) => {
+      const tilt = screenTilt(event);
+      if (!tilt) return;
+      rest ??= tilt;
+      rest.x += (tilt.x - rest.x) * GYRO_RECENTER;
+      rest.y += (tilt.y - rest.y) * GYRO_RECENTER;
+      rotateX.set(clampTilt(-(tilt.x - rest.x) * GYRO_GAIN));
+      rotateY.set(clampTilt((tilt.y - rest.y) * GYRO_GAIN));
+    };
+    window.addEventListener("deviceorientation", onOrientation);
+    return () => {
+      window.removeEventListener("deviceorientation", onOrientation);
+      rotateX.set(0);
+      rotateY.set(0);
+    };
+  }, [isTouchDevice, reduceMotion, rotateX, rotateY]);
 
   const handleMouseMove = (event: MouseEvent<HTMLDivElement>) => {
     // Only tilt on large screens with a real hover-capable pointer.
-    if (!window.matchMedia("(min-width: 1024px) and (hover: hover)").matches) {
+    if (reduceMotion || !window.matchMedia("(min-width: 1024px) and (hover: hover)").matches) {
       return;
     }
     const rect = event.currentTarget.getBoundingClientRect();

@@ -1,4 +1,4 @@
-# Public Transport Ticket Gallery
+# Ticket Gallery
 
 A small and fun collection of real public transport tickets I collected from the cities I visited. You can flip each ticket to see the front and back and switch between light and dark themes.
 
@@ -6,7 +6,8 @@ A small and fun collection of real public transport tickets I collected from the
 - Browse through a list of cities and view their tickets.
 - Flip a ticket to show its other side.
 - Move to the next or previous city.
-- Use the left/right arrow keys to move between cities.
+- Use the left/right arrow keys to move between cities, or swipe on a phone.
+- On phones, tilt the device to tilt the ticket (uses the gyroscope).
 - Toggle between light and dark mode.
 
 ## Getting Started

@@ -7,8 +7,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Train Ticket Gallery",
-  description: "A gallery showcasing train tickets",
+  title: "Ticket Gallery",
+  description: "A collection of real public transport tickets from cities I have visited. Flip each one to see both sides.",
   icons: {
     icon: "/favicon.ico",
   },

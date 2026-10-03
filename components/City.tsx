@@ -1,12 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import type { CityData } from "@/lib/cityData";
 import { MAP_SIZES, TICKET_SIZES } from "@/lib/images";
+import { TOUCH_DEVICE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 import FlipCard from "./FlipCard";
 
 const ANIMATION_OFFSET = 350;
+
+// A swipe counts once the finger has travelled this far, or flicked this fast.
+const SWIPE_DISTANCE = 80; // px
+const SWIPE_VELOCITY = 400; // px/s
 
 const slideVariants = {
   enter: (direction: number) => ({
@@ -28,25 +34,54 @@ const slideVariants = {
 type TicketImageProps = {
   city: CityData;
   side: "front" | "back";
-  isFirst: boolean;
+  priority?: boolean;
+  onLoad?: () => void;
 };
 
-const TicketImage = ({ city, side, isFirst }: TicketImageProps) => {
-  // The first city's front face is the page's LCP element: fetch it right away.
-  const isLcp = isFirst && side === "front";
+const TicketImage = ({ city, side, priority, onLoad }: TicketImageProps) => (
+  <Image
+    src={city.ticketImage[side]}
+    alt={`${city.city} transport ticket ${side}`}
+    sizes={TICKET_SIZES}
+    placeholder="blur"
+    loading={priority ? "eager" : undefined}
+    fetchPriority={priority ? "high" : undefined}
+    draggable={false}
+    onLoad={onLoad}
+    className="h-auto max-h-[450px] w-auto max-w-full object-contain"
+  />
+);
+
+type TicketProps = {
+  city: CityData;
+  isFirst: boolean;
+  isFlipped: boolean;
+};
+
+function Ticket({ city, isFirst, isFlipped }: TicketProps) {
+  // The back face is hidden until flipped, so don't let it compete for
+  // bandwidth with the front: request it once the front has loaded.
+  const [frontLoaded, setFrontLoaded] = useState(false);
+
   return (
-    <Image
-      src={city.ticketImage[side]}
-      alt={`${city.city} transport ticket ${side}`}
-      sizes={TICKET_SIZES}
-      placeholder="blur"
-      loading={isLcp ? "eager" : undefined}
-      fetchPriority={isLcp ? "high" : undefined}
-      className="h-auto max-h-[450px] w-auto max-w-full object-contain"
+    <FlipCard
+      isFlipped={isFlipped}
+      // The first city's front face is fetched right away with high priority.
+      front={
+        <TicketImage
+          city={city}
+          side="front"
+          priority={isFirst}
+          onLoad={() => setFrontLoaded(true)}
+        />
+      }
+      back={frontLoaded || isFlipped ? <TicketImage city={city} side="back" /> : null}
     />
   );
-};
+}
 
+// Maps are the largest visible element (the LCP), so they load eagerly
+// instead of waiting for the lazy-loading heuristics.
 const mapClassName =
   "pointer-events-none select-none object-contain transition-opacity duration-300 ease-in-out";
 
@@ -55,9 +90,17 @@ type Props = {
   direction: number;
   index: number;
   isFlipped: boolean;
+  onSwipe: (step: 1 | -1) => void;
 };
 
-export default function City({ city, direction, index, isFlipped }: Props) {
+export default function City({ city, direction, index, isFlipped, onSwipe }: Props) {
+  const isTouchDevice = useMediaQuery(TOUCH_DEVICE_QUERY);
+
+  const handleDragEnd = (_: unknown, { offset, velocity }: PanInfo) => {
+    if (offset.x < -SWIPE_DISTANCE || velocity.x < -SWIPE_VELOCITY) onSwipe(1);
+    else if (offset.x > SWIPE_DISTANCE || velocity.x > SWIPE_VELOCITY) onSwipe(-1);
+  };
+
   return (
     <div className="relative flex min-h-[540px] w-full max-w-[902px] flex-col items-center justify-center overflow-hidden">
       {/* Both theme maps are rendered and cross-faded with CSS, so the correct
@@ -70,6 +113,7 @@ export default function City({ city, direction, index, isFlipped }: Props) {
         alt=""
         fill
         sizes={MAP_SIZES}
+        loading="eager"
         className={`${mapClassName} opacity-100 dark:opacity-0`}
       />
       <Image
@@ -78,10 +122,13 @@ export default function City({ city, direction, index, isFlipped }: Props) {
         alt=""
         fill
         sizes={MAP_SIZES}
+        loading="eager"
         className={`${mapClassName} opacity-0 dark:opacity-100`}
       />
 
-      <div className="relative z-20 flex max-h-[760px] min-h-[200px] w-full max-w-[350px] flex-col items-center justify-center">
+      {/* The ticket column fills the full height so a swipe anywhere on it
+          (not only on the ticket itself) changes city. */}
+      <div className="relative z-20 flex max-h-[760px] min-h-[200px] w-full max-w-[350px] flex-1 flex-col items-center justify-center">
         <AnimatePresence initial={false} custom={direction} mode="wait">
           <motion.div
             key={index}
@@ -94,13 +141,14 @@ export default function City({ city, direction, index, isFlipped }: Props) {
               x: { type: "spring", stiffness: 500, damping: 40 },
               opacity: { duration: 0.15 },
             }}
-            className="w-full"
+            // Swipe left/right on touch devices; vertical scrolling still works.
+            drag={isTouchDevice ? "x" : false}
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.7}
+            onDragEnd={handleDragEnd}
+            className="flex w-full flex-1 items-center justify-center"
           >
-            <FlipCard
-              isFlipped={isFlipped}
-              front={<TicketImage city={city} side="front" isFirst={index === 0} />}
-              back={<TicketImage city={city} side="back" isFirst={index === 0} />}
-            />
+            <Ticket city={city} isFirst={index === 0} isFlipped={isFlipped} />
           </motion.div>
         </AnimatePresence>
       </div>

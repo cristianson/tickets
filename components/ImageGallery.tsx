@@ -6,6 +6,7 @@ import { useTheme } from "next-themes";
 import ChevronButton from "./ui/chevronButton";
 import FlipButton from "./ui/flipButton";
 import Cities from "@/lib/cityData";
+import { requestTiltPermissionOnFirstTap } from "@/lib/deviceTilt";
 import { preloadCity } from "@/lib/images";
 import City from "./City";
 import CityText from "./ui/cityText";
@@ -48,6 +49,10 @@ export default function ImageGallery() {
   }, [currentIndex, resolvedTheme]);
 
   useEffect(() => {
+    requestTiltPermissionOnFirstTap();
+  }, []);
+
+  useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
       if (event.key === "ArrowLeft") paginate(-1);
@@ -73,6 +78,7 @@ export default function ImageGallery() {
             direction={direction}
             index={currentIndex}
             isFlipped={isFlipped}
+            onSwipe={paginate}
           />
           <ChevronButton
             className="hidden sm:flex"
