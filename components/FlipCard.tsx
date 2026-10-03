@@ -11,6 +11,12 @@ const spring = {
   damping: 40,
 } as const;
 
+// Each face is a flat panel. Not preserve-3d: in Safari, children of a
+// preserve-3d face become separate 3D planes that don't inherit the face's
+// backface-visibility, which can make content vanish or show through from
+// behind. The -webkit- prefix is for iOS before 15.4.
+const FACE = "[-webkit-backface-visibility:hidden] [backface-visibility:hidden]";
+
 type Props = {
   front: ReactNode;
   back: ReactNode;
@@ -95,14 +101,14 @@ export default function FlipCard({ front, back, isFlipped, onFlip }: Props) {
         style={{ rotateX, rotateY }}
       >
         <motion.div
-          className="flex items-center justify-center [backface-visibility:hidden] [transform-style:preserve-3d]"
+          className={`flex items-center justify-center ${FACE}`}
           style={{ rotateY: frontRotateY, visibility: frontVisibility }}
           aria-hidden={isFlipped}
         >
           {front}
         </motion.div>
         <motion.div
-          className="absolute left-0 top-0 [backface-visibility:hidden] [transform-style:preserve-3d]"
+          className={`absolute left-0 top-0 ${FACE}`}
           style={{ rotateY: backRotateY, visibility: backVisibility }}
           aria-hidden={!isFlipped}
         >

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import type { CityData } from "@/lib/cityData";
@@ -48,20 +47,23 @@ const slideVariants = {
 type TicketImageProps = {
   city: CityData;
   side: "front" | "back";
-  priority?: boolean;
-  onLoad?: () => void;
+  isFirst: boolean;
 };
 
-const TicketImage = ({ city, side, priority, onLoad }: TicketImageProps) => (
+// Both faces load eagerly: the back is hidden and rotated 180deg until flipped,
+// and Safari's lazy loading doesn't reliably notice when a rotated element
+// becomes visible, which could leave the back blank. Instead the back loads at
+// low priority, so it doesn't compete with the front. The first city's front
+// is the page's main image, so it gets high priority.
+const TicketImage = ({ city, side, isFirst }: TicketImageProps) => (
   <Image
     src={city.ticketImage[side]}
     alt={`${city.city} transport ticket ${side}`}
     sizes={TICKET_SIZES}
     placeholder="blur"
-    loading={priority ? "eager" : undefined}
-    fetchPriority={priority ? "high" : undefined}
+    loading="eager"
+    fetchPriority={side === "back" ? "low" : isFirst ? "high" : undefined}
     draggable={false}
-    onLoad={onLoad}
     // On phones, never taller than the space between the title and controls
     // (two 74px button rows + 72px title + breathing room).
     className="h-auto max-h-[min(450px,calc(100dvh_-_260px))] w-auto max-w-full object-contain sm:max-h-[450px]"
@@ -76,24 +78,14 @@ type TicketProps = {
 };
 
 function Ticket({ city, isFirst, isFlipped, onFlip }: TicketProps) {
-  // The back face is hidden until flipped, so don't let it compete for
-  // bandwidth with the front: request it once the front has loaded.
-  const [frontLoaded, setFrontLoaded] = useState(false);
-
+  // The back is always in the page (not added once the front has loaded):
+  // Safari can fail to paint content added later to a hidden, rotated layer.
   return (
     <FlipCard
       isFlipped={isFlipped}
       onFlip={onFlip}
-      // The first city's front face is fetched right away with high priority.
-      front={
-        <TicketImage
-          city={city}
-          side="front"
-          priority={isFirst}
-          onLoad={() => setFrontLoaded(true)}
-        />
-      }
-      back={frontLoaded || isFlipped ? <TicketImage city={city} side="back" /> : null}
+      front={<TicketImage city={city} side="front" isFirst={isFirst} />}
+      back={<TicketImage city={city} side="back" isFirst={isFirst} />}
     />
   );
 }
