@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion, type PanInfo } from "framer-motion";
+import { AnimatePresence, motion, useTransform, type PanInfo } from "framer-motion";
 import type { CityData } from "@/lib/cityData";
 import { mapImage, TICKET_SIZES, type MapVariant } from "@/lib/images";
 import { TOUCH_DEVICE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
-import FlipCard from "./FlipCard";
+import { cardTilt } from "@/lib/deviceTilt";
+import FlipCard, { TicketShine } from "./FlipCard";
 
 const ANIMATION_OFFSET = 350;
 
@@ -38,21 +39,32 @@ type TicketImageProps = {
   onLoad?: () => void;
 };
 
-const TicketImage = ({ city, side, priority, onLoad }: TicketImageProps) => (
-  <Image
-    src={city.ticketImage[side]}
-    alt={`${city.city} transport ticket ${side}`}
-    sizes={TICKET_SIZES}
-    placeholder="blur"
-    loading={priority ? "eager" : undefined}
-    fetchPriority={priority ? "high" : undefined}
-    draggable={false}
-    onLoad={onLoad}
-    // On phones, never taller than the space between the title and controls
-    // (two 74px button rows + 72px title + breathing room).
-    className="h-auto max-h-[min(450px,calc(100dvh_-_260px))] w-auto max-w-full object-contain sm:max-h-[450px]"
-  />
-);
+const TicketImage = ({ city, side, priority, onLoad }: TicketImageProps) => {
+  // The shine is masked by this image, using the URL the browser already
+  // downloaded (no extra request).
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+  return (
+    <>
+      <Image
+        src={city.ticketImage[side]}
+        alt={`${city.city} transport ticket ${side}`}
+        sizes={TICKET_SIZES}
+        placeholder="blur"
+        loading={priority ? "eager" : undefined}
+        fetchPriority={priority ? "high" : undefined}
+        draggable={false}
+        onLoad={(event) => {
+          setLoadedSrc(event.currentTarget.currentSrc);
+          onLoad?.();
+        }}
+        // On phones, never taller than the space between the title and controls
+        // (two 74px button rows + 72px title + breathing room).
+        className="h-auto max-h-[min(450px,calc(100dvh_-_260px))] w-auto max-w-full object-contain sm:max-h-[450px]"
+      />
+      <TicketShine src={loadedSrc} />
+    </>
+  );
+};
 
 type TicketProps = {
   city: CityData;
@@ -133,6 +145,11 @@ type Props = {
 
 export default function City({ city, direction, index, isFlipped, onSwipe, onFlip }: Props) {
   const isTouchDevice = useMediaQuery(TOUCH_DEVICE_QUERY);
+  // Parallax: the map drifts the opposite way to the ticket's tilt (up to
+  // ~15px), so the ticket looks like it floats above the city. The maps' edges
+  // are faded out, so the shift never reveals an edge.
+  const mapX = useTransform(cardTilt.y, (deg) => -deg * 1.5);
+  const mapY = useTransform(cardTilt.x, (deg) => deg * 1.5);
 
   const handleDragEnd = (_: unknown, { offset, velocity }: PanInfo) => {
     if (offset.x < -SWIPE_DISTANCE || velocity.x < -SWIPE_VELOCITY) onSwipe(1);
@@ -149,8 +166,10 @@ export default function City({ city, direction, index, isFlipped, onSwipe, onFli
           idle so a theme switch is instant; the switch itself is cross-faded
           by ThemeToggleButton. Keyed by city so a slow-loading map never
           leaves the previous city's map on screen. */}
-      <CityMap key={`${city.city}-light`} city={city} theme="light" />
-      <CityMap key={`${city.city}-dark`} city={city} theme="dark" />
+      <motion.div aria-hidden className="absolute inset-0" style={{ x: mapX, y: mapY }}>
+        <CityMap key={`${city.city}-light`} city={city} theme="light" />
+        <CityMap key={`${city.city}-dark`} city={city} theme="dark" />
+      </motion.div>
 
       {/* The ticket column fills the full height so a swipe anywhere on it
           (not only on the ticket itself) changes city. */}
