@@ -1,21 +1,24 @@
-// Downscales and re-encodes the gallery images in /assets.
+// Prepares the gallery images in /assets:
+// 1. Downscales and re-encodes oversized images. Ticket photos straight from an
+//    export are far larger than they are ever displayed (at most 350x450px).
+//    next/image resizes on the fly, but smaller sources mean faster first-hit
+//    optimization and a lighter repo.
+// 2. Generates the phone crop of each map (assets/maps/mobile/<theme>/). On
+//    phones the map covers a tall stage and only its middle is visible, so
+//    phones download this crop instead of the whole map (see City.tsx).
 //
-// Source photos/maps straight from an export are far larger than they are ever
-// displayed (maps render at most 902px wide, tickets at most 350x450px).
-// next/image resizes on the fly, but smaller sources mean faster first-hit
-// optimization, a lighter repo, and a sane fallback if optimization is off.
-//
-// Usage: npm run optimize-images            (only touches oversized files)
-//        npm run optimize-images -- --force (re-encode everything)
-import { readdir, rename, stat } from "node:fs/promises";
+// Usage: npm run optimize-images            (only touches what's needed)
+//        npm run optimize-images -- --force (redo everything)
+import { access, mkdir, readdir, rename, stat } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 
 const ROOT = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "assets");
 const force = process.argv.includes("--force");
 
-// Tickets: 2x the largest rendered size. Maps: on phones they cover a tall
-// stage and are drawn up to ~1200px wide on 3x screens, so keep up to 3840px.
+// Tickets: 2x the largest rendered size. Maps: keep the full-size originals
+// (desktop draws them up to 902px wide; 2x screens need ~1800px, and the crop
+// for phones is cut from the full resolution).
 const PRESETS = {
   maps: { maxWidth: 3840, maxHeight: 3840, quality: 80, alphaQuality: 90 },
   tickets: { maxWidth: 1400, maxHeight: 1400, quality: 80, alphaQuality: 90 },
@@ -56,4 +59,26 @@ for await (const file of walk(ROOT)) {
   );
 }
 
-console.log(`\nTotal: ${(before / 1048576).toFixed(1)}MB -> ${(after / 1048576).toFixed(1)}MB`);
+console.log(`\nResized: ${(before / 1048576).toFixed(1)}MB -> ${(after / 1048576).toFixed(1)}MB`);
+
+// Phone crops: the middle half of each map, full height. Phones show between
+// ~36% (Pro Max) and ~50% (iPhone SE) of the map's width; the crop's 0.84
+// aspect ratio is referenced in lib/images.ts (MOBILE_MAP_SIZES).
+const MOBILE_CROP_WIDTH = 0.5;
+const exists = (file) => access(file).then(() => true, () => false);
+for (const theme of ["light", "dark"]) {
+  const dir = path.join(ROOT, "maps", theme);
+  const outDir = path.join(ROOT, "maps", "mobile", theme);
+  await mkdir(outDir, { recursive: true });
+  for (const name of await readdir(dir)) {
+    const out = path.join(outDir, name);
+    if (!force && (await exists(out))) continue;
+    const { width, height } = await sharp(path.join(dir, name)).metadata();
+    const cropWidth = Math.round(width * MOBILE_CROP_WIDTH);
+    const info = await sharp(path.join(dir, name))
+      .extract({ left: Math.round((width - cropWidth) / 2), top: 0, width: cropWidth, height })
+      .webp({ quality: 90, alphaQuality: 100, effort: 6 })
+      .toFile(out);
+    console.log(`maps/mobile/${theme}/${name}: ${info.width}x${info.height}, ${(info.size / 1024).toFixed(0)}KB`);
+  }
+}

@@ -21,19 +21,19 @@ A small and fun collection of real public transport tickets I collected from the
 - `npm run build` – create a production build.
 - `npm run start` – run the production build.
 - `npm run lint` – check the code for common problems.
-- `npm run optimize-images` – downscale and re-encode any oversized images in `assets/`.
+- `npm run optimize-images` – downscale oversized images in `assets/` and generate the phone crops of the maps.
 
 ## Project Structure
 - `app/` – Next.js pages and layout.
 - `components/` – React components like the image gallery and theme switcher.
 - `lib/` – data about the cities and tickets, plus image helpers.
-- `assets/` – ticket photos (`tickets/`) and map backgrounds (`maps/light`, `maps/dark`).
+- `assets/` – ticket photos (`tickets/`) and map backgrounds (`maps/light`, `maps/dark`, plus phone crops in `maps/mobile`).
 - `public/` – static files served as-is (favicon).
 - `scripts/` – maintenance scripts such as the image optimizer.
 
 ## Adding a City
 1. Add the ticket photos to `assets/tickets/<city>/` and the maps to `assets/maps/light/` and `assets/maps/dark/`.
-2. Run `npm run optimize-images` so the files are resized to what the site actually displays.
-3. Import the images and add an entry in `lib/cityData.ts`.
+2. Run `npm run optimize-images`: it resizes the ticket photos to what the site displays and generates the phone crops of the maps (`assets/maps/mobile/`).
+3. Import the images (including the two phone crops) and add an entry in `lib/cityData.ts`.
 
 No license information was provided.
