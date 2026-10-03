@@ -4,7 +4,7 @@ A small and fun collection of real public transport tickets I collected from the
 
 ## Features
 - Browse through a list of cities and view their tickets.
-- Flip a ticket to show its other side.
+- Flip a ticket to show its other side, with the Flip button or by tapping/clicking the ticket.
 - Move to the next or previous city.
 - Use the left/right arrow keys to move between cities, or swipe on a phone.
 - On phones, tilt the device to tilt the ticket (uses the gyroscope). iPhones show an "Enable tilt" button, since iOS requires permission for motion sensors.

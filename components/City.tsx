@@ -58,9 +58,10 @@ type TicketProps = {
   city: CityData;
   isFirst: boolean;
   isFlipped: boolean;
+  onFlip: () => void;
 };
 
-function Ticket({ city, isFirst, isFlipped }: TicketProps) {
+function Ticket({ city, isFirst, isFlipped, onFlip }: TicketProps) {
   // The back face is hidden until flipped, so don't let it compete for
   // bandwidth with the front: request it once the front has loaded.
   const [frontLoaded, setFrontLoaded] = useState(false);
@@ -68,6 +69,7 @@ function Ticket({ city, isFirst, isFlipped }: TicketProps) {
   return (
     <FlipCard
       isFlipped={isFlipped}
+      onFlip={onFlip}
       // The first city's front face is fetched right away with high priority.
       front={
         <TicketImage
@@ -95,9 +97,10 @@ type Props = {
   index: number;
   isFlipped: boolean;
   onSwipe: (step: 1 | -1) => void;
+  onFlip: () => void;
 };
 
-export default function City({ city, direction, index, isFlipped, onSwipe }: Props) {
+export default function City({ city, direction, index, isFlipped, onSwipe, onFlip }: Props) {
   const isTouchDevice = useMediaQuery(TOUCH_DEVICE_QUERY);
 
   const handleDragEnd = (_: unknown, { offset, velocity }: PanInfo) => {
@@ -154,7 +157,7 @@ export default function City({ city, direction, index, isFlipped, onSwipe }: Pro
             onDragEnd={handleDragEnd}
             className="flex w-full flex-1 items-center justify-center"
           >
-            <Ticket city={city} isFirst={index === 0} isFlipped={isFlipped} />
+            <Ticket city={city} isFirst={index === 0} isFlipped={isFlipped} onFlip={onFlip} />
           </motion.div>
         </AnimatePresence>
       </div>

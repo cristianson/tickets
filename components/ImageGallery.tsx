@@ -79,6 +79,7 @@ export default function ImageGallery() {
             index={currentIndex}
             isFlipped={isFlipped}
             onSwipe={paginate}
+            onFlip={toggleFlip}
           />
           <ChevronButton
             className="hidden sm:flex"

@@ -25,9 +25,10 @@ type Props = {
   front: ReactNode;
   back: ReactNode;
   isFlipped: boolean;
+  onFlip: () => void;
 };
 
-export default function FlipCard({ front, back, isFlipped }: Props) {
+export default function FlipCard({ front, back, isFlipped, onFlip }: Props) {
   // Tilt is driven by motion values rather than React state so pointer
   // movement animates without re-rendering the component on every event.
   const rotateX = useSpring(useMotionValue(0), spring);
@@ -93,7 +94,10 @@ export default function FlipCard({ front, back, isFlipped }: Props) {
 
   return (
     <motion.div
-      className="flex items-center justify-center [perspective:1200px]"
+      className="flex cursor-pointer items-center justify-center [perspective:1200px]"
+      // Tap/click the ticket to flip it. framer-motion doesn't fire onTap when
+      // the gesture turned into a drag, so swiping to change city won't flip.
+      onTap={onFlip}
       whileHover={{ scale: 1.02 }}
       transition={spring}
       onMouseMove={handleMouseMove}
