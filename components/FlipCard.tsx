@@ -2,7 +2,7 @@
 
 import { useEffect, type MouseEvent, type ReactNode } from "react";
 import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
-import { screenTilt } from "@/lib/deviceTilt";
+import { screenTilt, useTiltPermission } from "@/lib/deviceTilt";
 import { TOUCH_DEVICE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 
 const spring = {
@@ -34,10 +34,13 @@ export default function FlipCard({ front, back, isFlipped }: Props) {
   const rotateY = useSpring(useMotionValue(0), spring);
   const reduceMotion = useReducedMotion();
   const isTouchDevice = useMediaQuery(TOUCH_DEVICE_QUERY);
+  const tiltPermission = useTiltPermission();
+  const gyroAvailable = tiltPermission === "not-needed" || tiltPermission === "granted";
 
   // On phones, tilt the card with the device's gyroscope instead of the mouse.
+  // On iOS this only starts once the user has enabled it (see TiltButton).
   useEffect(() => {
-    if (!isTouchDevice || reduceMotion) return;
+    if (!isTouchDevice || reduceMotion || !gyroAvailable) return;
     let rest: { x: number; y: number } | null = null;
     const onOrientation = (event: DeviceOrientationEvent) => {
       const tilt = screenTilt(event);
@@ -54,7 +57,7 @@ export default function FlipCard({ front, back, isFlipped }: Props) {
       rotateX.set(0);
       rotateY.set(0);
     };
-  }, [isTouchDevice, reduceMotion, rotateX, rotateY]);
+  }, [isTouchDevice, reduceMotion, gyroAvailable, rotateX, rotateY]);
 
   const handleMouseMove = (event: MouseEvent<HTMLDivElement>) => {
     // Only tilt on large screens with a real hover-capable pointer.

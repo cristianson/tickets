@@ -7,7 +7,7 @@ A small and fun collection of real public transport tickets I collected from the
 - Flip a ticket to show its other side.
 - Move to the next or previous city.
 - Use the left/right arrow keys to move between cities, or swipe on a phone.
-- On phones, tilt the device to tilt the ticket (uses the gyroscope).
+- On phones, tilt the device to tilt the ticket (uses the gyroscope). iPhones show an "Enable tilt" button, since iOS requires permission for motion sensors.
 - Toggle between light and dark mode.
 
 ## Getting Started
