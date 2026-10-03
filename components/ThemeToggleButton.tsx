@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useState } from "react";
 import { useTheme } from "next-themes";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion, type Variants } from "framer-motion";
 import { cn, commonButtonStyles, iconButtonStyles } from "@/lib/utils";
 import InsetShadowFilter from "./ui/insetShadowFilter";
 
@@ -21,16 +21,38 @@ const SUN_PATHS = [
 const MOON_PATH =
   "M6.8002 1.80907C6.92881 1.52469 6.86785 1.19039 6.64716 0.969692C6.42647 0.748998 6.09216 0.688047 5.80779 0.816654C2.8267 2.16482 0.75 5.16573 0.75 8.65329C0.75 13.4011 4.59889 17.25 9.34673 17.25C12.8343 17.25 15.8352 15.1733 17.1834 12.1922C17.312 11.9079 17.251 11.5736 17.0303 11.3529C16.8096 11.1322 16.4753 11.0712 16.191 11.1998C15.3011 11.6023 14.3128 11.8267 13.2701 11.8267C9.35068 11.8267 6.17337 8.64934 6.17337 4.72992C6.17337 3.68721 6.39777 2.69893 6.8002 1.80907Z";
 
-const iconAnimationProps = {
-  initial: { y: -20, opacity: 0, rotate: -180 },
-  animate: { y: 0, opacity: 1, rotate: 0 },
-  exit: { y: 20, opacity: 0, rotate: 180 },
-  transition: { duration: 0.3 },
+// The sun lives on the left and the moon on the right: switching to light
+// slides the sun out to the left while the moon slides in from the right, and
+// the reverse when switching to dark. Both icons move at the same time (no gap
+// with an empty button) and are clipped by the round button.
+const ICON_OFFSET = 34; // px: just outside the 42px circle
+// `slide` is passed through AnimatePresence's `custom`, so an icon that is on
+// its way out still gets the current value. When false (page load, reduced
+// motion) the icons only fade.
+const iconVariants: Variants = {
+  sunHidden: (slide: boolean) =>
+    slide ? { x: -ICON_OFFSET, rotate: -90, opacity: 0 } : { opacity: 0 },
+  moonHidden: (slide: boolean) =>
+    slide ? { x: ICON_OFFSET, rotate: 45, opacity: 0 } : { opacity: 0 },
+  shown: { x: 0, rotate: 0, opacity: 1 },
+};
+const iconTransition = {
+  default: { type: "spring", duration: 0.55, bounce: 0 },
+  opacity: { duration: 0.3, ease: "easeInOut" },
+} as const;
+
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (update: () => void) => { finished: Promise<void> };
 };
 
 export const ThemeToggleButton = () => {
   const [mounted, setMounted] = useState(false);
+  // Slide only for switches made with this button; the icon just fades in on
+  // page load.
+  const [hasToggled, setHasToggled] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
+  const reduceMotion = useReducedMotion();
+  // Both icons are on screen together mid-switch, so each needs its own id.
   const filterId = useId();
 
   // The theme is only known on the client. Render the button shell during SSR
@@ -42,57 +64,110 @@ export const ThemeToggleButton = () => {
 
   const isDark = resolvedTheme === "dark";
 
+  const toggleTheme = () => {
+    const next = isDark ? "light" : "dark";
+    setHasToggled(true);
+
+    // Cross-fade the whole page between themes in one step with the View
+    // Transitions API. Without it, the background, text, buttons and maps each
+    // change on their own timing (text instantly, background over 200ms, maps
+    // over 300ms), which reads as a flicker.
+    const doc = document as ViewTransitionDocument;
+    if (!doc.startViewTransition || reduceMotion) {
+      setTheme(next);
+      return;
+    }
+    const root = document.documentElement;
+    // Show each theme's final colours straight away inside the cross-fade.
+    root.classList.add("theme-switching");
+    const transition = doc.startViewTransition(() => {
+      // next-themes applies the class in an effect, after the browser has
+      // captured the new state, so apply it synchronously here as well.
+      root.classList.remove("light", "dark");
+      root.classList.add(next);
+      root.style.colorScheme = next;
+      setTheme(next);
+    });
+    transition.finished.finally(() => root.classList.remove("theme-switching"));
+  };
+
+  const slide = hasToggled && !reduceMotion;
+
   return (
     <motion.button
       aria-label={mounted ? `Switch to ${isDark ? "light" : "dark"} theme` : "Toggle theme"}
       type="button"
-      className={cn(commonButtonStyles, iconButtonStyles, "fixed right-4 top-4 z-50 overflow-hidden")}
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-      whileHover={{ scale: 1.1, rotate: 90 }}
-      whileTap={{ scale: 0.9, rotate: -90 }}
-      transition={{ type: "tween", duration: 0.1, ease: "easeInOut" }}
+      className={cn(
+        commonButtonStyles,
+        iconButtonStyles,
+        // Only colours use CSS transitions: a CSS transition on `transform`
+        // would fight the per-frame transforms set by framer-motion.
+        "theme-toggle fixed right-4 top-4 z-50 overflow-hidden transition-colors [view-transition-name:theme-toggle]"
+      )}
+      onClick={toggleTheme}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.92 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
-      <span className="block h-6 w-6">
-      <AnimatePresence mode="wait" initial={false}>
-        {mounted && isDark && (
-          <motion.div key="sun" {...iconAnimationProps}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              className="h-6 w-6"
-              aria-hidden="true"
+      <span className="relative block h-6 w-6">
+        <AnimatePresence initial={false} custom={slide}>
+          {mounted && isDark && (
+            <motion.div
+              key="sun"
+              className="absolute inset-0"
+              variants={iconVariants}
+              custom={slide}
+              initial="sunHidden"
+              animate="shown"
+              exit="sunHidden"
+              transition={iconTransition}
             >
-              <defs>
-                <InsetShadowFilter id={filterId} dy={1.2} blur={0.3} opacity={0.5} />
-              </defs>
-              {SUN_PATHS.map((d) => (
-                <path key={d} filter={`url(#${filterId})`} d={d} fill="currentColor" />
-              ))}
-            </svg>
-          </motion.div>
-        )}
-        {mounted && !isDark && (
-          <motion.div key="moon" {...iconAnimationProps}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
-              fill="none"
-              className="h-6 w-6"
-              aria-hidden="true"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                className="h-6 w-6"
+                aria-hidden="true"
+              >
+                <defs>
+                  <InsetShadowFilter id={`${filterId}-sun`} dy={1.2} blur={0.3} opacity={0.5} />
+                </defs>
+                {SUN_PATHS.map((d) => (
+                  <path key={d} filter={`url(#${filterId}-sun)`} d={d} fill="currentColor" />
+                ))}
+              </svg>
+            </motion.div>
+          )}
+          {mounted && !isDark && (
+            <motion.div
+              key="moon"
+              className="absolute inset-0"
+              variants={iconVariants}
+              custom={slide}
+              initial="moonHidden"
+              animate="shown"
+              exit="moonHidden"
+              transition={iconTransition}
             >
-              <defs>
-                <InsetShadowFilter id={filterId} dy={1.2} blur={0.3} opacity={0.5} />
-              </defs>
-              <path filter={`url(#${filterId})`} d={MOON_PATH} fill="currentColor" />
-            </svg>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                fill="none"
+                className="h-6 w-6"
+                aria-hidden="true"
+              >
+                <defs>
+                  <InsetShadowFilter id={`${filterId}-moon`} dy={1.2} blur={0.3} opacity={0.5} />
+                </defs>
+                <path filter={`url(#${filterId}-moon)`} d={MOON_PATH} fill="currentColor" />
+              </svg>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </span>
     </motion.button>
   );

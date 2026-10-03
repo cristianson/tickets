@@ -17,3 +17,31 @@
     mask-image: linear-gradient(to right, transparent, #000 22%, #000 78%, transparent);
   }
 }
+
+/* Theme switch (see ThemeToggleButton): the whole page cross-fades between the
+   two themes in one step. The toggle button is excluded so its own icon
+   animation stays live instead of being cross-faded as a snapshot. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 450ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+::view-transition-old(theme-toggle) {
+  display: none;
+}
+::view-transition-new(theme-toggle) {
+  animation: none;
+}
+/* While cross-fading, render each theme's final colours immediately rather
+   than running the per-element colour transitions inside the snapshot. */
+.theme-switching,
+.theme-switching *:not(.theme-toggle) {
+  transition: none !important;
+}
+/* The toggle is outside the cross-fade (it stays live), so fade its own
+   colours with the same timing as the page. */
+.theme-switching .theme-toggle {
+  transition-property: color, background-color, border-color !important;
+  transition-duration: 450ms !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}

@@ -24,7 +24,8 @@ export default function TiltButton() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className={cn(commonButtonStyles, pillButtonStyles, "fixed left-4 top-4 z-50")}
+          // transition-colors: a CSS opacity transition would fight the fade below.
+          className={cn(commonButtonStyles, pillButtonStyles, "fixed left-4 top-4 z-50 transition-colors")}
         >
           <span className="text-sm font-medium">Enable tilt</span>
           <svg
