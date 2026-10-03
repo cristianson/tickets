@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, type MouseEvent, type ReactNode } from "react";
-import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
 import { screenTilt, useTiltPermission } from "@/lib/deviceTilt";
 import { TOUCH_DEVICE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 
@@ -35,6 +35,21 @@ export default function FlipCard({ front, back, isFlipped }: Props) {
   const reduceMotion = useReducedMotion();
   const isTouchDevice = useMediaQuery(TOUCH_DEVICE_QUERY);
   const tiltPermission = useTiltPermission();
+
+  // Flip progress in degrees: 0 = front facing, 180 = back facing.
+  const flip = useSpring(isFlipped ? 180 : 0, spring);
+  useEffect(() => {
+    if (reduceMotion) flip.jump(isFlipped ? 180 : 0);
+    else flip.set(isFlipped ? 180 : 0);
+  }, [isFlipped, reduceMotion, flip]);
+  const frontRotateY = useTransform(flip, (deg) => -deg);
+  const backRotateY = useTransform(flip, (deg) => 180 - deg);
+  // Hide whichever face is turned away (it's edge-on at 90deg, so the switch
+  // is invisible). `backface-visibility` alone isn't enough: Safari ignores it
+  // in the flat snapshots taken for the theme cross-fade, which made the back
+  // of the ticket flash during a theme switch.
+  const frontVisibility = useTransform(flip, (deg) => (deg < 90 ? "visible" : "hidden"));
+  const backVisibility = useTransform(flip, (deg) => (deg < 90 ? "hidden" : "visible"));
   const gyroAvailable = tiltPermission === "not-needed" || tiltPermission === "granted";
 
   // On phones, tilt the card with the device's gyroscope instead of the mouse.
@@ -90,18 +105,14 @@ export default function FlipCard({ front, back, isFlipped }: Props) {
       >
         <motion.div
           className="flex items-center justify-center [backface-visibility:hidden] [transform-style:preserve-3d]"
-          initial={false}
-          animate={{ rotateY: isFlipped ? -180 : 0 }}
-          transition={spring}
+          style={{ rotateY: frontRotateY, visibility: frontVisibility }}
           aria-hidden={isFlipped}
         >
           {front}
         </motion.div>
         <motion.div
           className="absolute left-0 top-0 [backface-visibility:hidden] [transform-style:preserve-3d]"
-          initial={false}
-          animate={{ rotateY: isFlipped ? 0 : 180 }}
-          transition={spring}
+          style={{ rotateY: backRotateY, visibility: backVisibility }}
           aria-hidden={!isFlipped}
         >
           {back}

@@ -22,22 +22,29 @@ const MOON_PATH =
   "M6.8002 1.80907C6.92881 1.52469 6.86785 1.19039 6.64716 0.969692C6.42647 0.748998 6.09216 0.688047 5.80779 0.816654C2.8267 2.16482 0.75 5.16573 0.75 8.65329C0.75 13.4011 4.59889 17.25 9.34673 17.25C12.8343 17.25 15.8352 15.1733 17.1834 12.1922C17.312 11.9079 17.251 11.5736 17.0303 11.3529C16.8096 11.1322 16.4753 11.0712 16.191 11.1998C15.3011 11.6023 14.3128 11.8267 13.2701 11.8267C9.35068 11.8267 6.17337 8.64934 6.17337 4.72992C6.17337 3.68721 6.39777 2.69893 6.8002 1.80907Z";
 
 // The sun lives on the left and the moon on the right: switching to light
-// slides the sun out to the left while the moon slides in from the right, and
+// rolls the sun out to the left while the moon rolls in from the right, and
 // the reverse when switching to dark. Both icons move at the same time (no gap
 // with an empty button) and are clipped by the round button.
 const ICON_OFFSET = 34; // px: just outside the 42px circle
+// The icons roll like wheels: a 24px icon (12px radius) that travels
+// ICON_OFFSET turns by ICON_OFFSET / 12 radians, so it spins about 160deg
+// before settling. Moving right turns clockwise, moving left anticlockwise.
+const ROLL = Math.round((ICON_OFFSET / 12) * (180 / Math.PI));
+
 // `slide` is passed through AnimatePresence's `custom`, so an icon that is on
 // its way out still gets the current value. When false (page load, reduced
 // motion) the icons only fade.
 const iconVariants: Variants = {
   sunHidden: (slide: boolean) =>
-    slide ? { x: -ICON_OFFSET, rotate: -90, opacity: 0 } : { opacity: 0 },
+    slide ? { x: -ICON_OFFSET, rotate: -ROLL, opacity: 0 } : { opacity: 0 },
   moonHidden: (slide: boolean) =>
-    slide ? { x: ICON_OFFSET, rotate: 45, opacity: 0 } : { opacity: 0 },
+    slide ? { x: ICON_OFFSET, rotate: ROLL, opacity: 0 } : { opacity: 0 },
   shown: { x: 0, rotate: 0, opacity: 1 },
 };
+// x and rotate share one spring, so rotation stays locked to distance
+// travelled (rolling, not sliding).
 const iconTransition = {
-  default: { type: "spring", duration: 0.55, bounce: 0 },
+  default: { type: "spring", duration: 0.6, bounce: 0 },
   opacity: { duration: 0.3, ease: "easeInOut" },
 } as const;
 
