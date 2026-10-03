@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import type { CityData } from "@/lib/cityData";
-import { MAP_SIZES, TICKET_SIZES } from "@/lib/images";
+import { MAP_QUALITY, MAP_SIZES, TICKET_SIZES } from "@/lib/images";
 import { TOUCH_DEVICE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 import FlipCard from "./FlipCard";
 
@@ -48,7 +48,8 @@ const TicketImage = ({ city, side, priority, onLoad }: TicketImageProps) => (
     fetchPriority={priority ? "high" : undefined}
     draggable={false}
     onLoad={onLoad}
-    className="h-auto max-h-[450px] w-auto max-w-full object-contain"
+    // On phones, never taller than the space between the title and controls.
+    className="h-auto max-h-[min(450px,calc(100dvh_-_280px))] w-auto max-w-full object-contain sm:max-h-[450px]"
   />
 );
 
@@ -81,9 +82,11 @@ function Ticket({ city, isFirst, isFlipped }: TicketProps) {
 }
 
 // Maps are the largest visible element (the LCP), so they load eagerly
-// instead of waiting for the lazy-loading heuristics.
+// instead of waiting for the lazy-loading heuristics. On phones the map
+// covers the whole ticket stage and fades out at the sides (see globals.css);
+// on larger screens it is shown whole.
 const mapClassName =
-  "pointer-events-none select-none object-contain transition-opacity duration-300 ease-in-out";
+  "map-fade-x pointer-events-none select-none object-cover transition-opacity duration-300 ease-in-out sm:object-contain";
 
 type Props = {
   city: CityData;
@@ -102,7 +105,7 @@ export default function City({ city, direction, index, isFlipped, onSwipe }: Pro
   };
 
   return (
-    <div className="relative flex min-h-[470px] w-full max-w-[902px] sm:min-h-[540px] flex-col items-center justify-center overflow-hidden">
+    <div className="relative flex min-h-[300px] w-full max-w-[902px] flex-col items-center justify-center self-stretch overflow-hidden sm:min-h-[540px] sm:self-auto">
       {/* Both theme maps are rendered and cross-faded with CSS, so the correct
           one shows on first paint (no wait for hydration) and theme toggles
           animate without JavaScript. Keyed by city so a slow-loading map
@@ -113,6 +116,7 @@ export default function City({ city, direction, index, isFlipped, onSwipe }: Pro
         alt=""
         fill
         sizes={MAP_SIZES}
+        quality={MAP_QUALITY}
         loading="eager"
         className={`${mapClassName} opacity-100 dark:opacity-0`}
       />
@@ -122,13 +126,14 @@ export default function City({ city, direction, index, isFlipped, onSwipe }: Pro
         alt=""
         fill
         sizes={MAP_SIZES}
+        quality={MAP_QUALITY}
         loading="eager"
         className={`${mapClassName} opacity-0 dark:opacity-100`}
       />
 
       {/* The ticket column fills the full height so a swipe anywhere on it
           (not only on the ticket itself) changes city. */}
-      <div className="relative z-20 flex max-h-[760px] min-h-[200px] w-full max-w-[350px] flex-1 flex-col items-center justify-center">
+      <div className="relative z-20 flex max-h-[760px] min-h-[200px] w-full max-w-[382px] flex-1 flex-col items-center justify-center px-4 sm:max-w-[350px] sm:px-0">
         <AnimatePresence initial={false} custom={direction} mode="wait">
           <motion.div
             key={index}

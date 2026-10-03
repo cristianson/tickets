@@ -8,3 +8,12 @@
     @apply dark:bg-gray-900 dark:text-gray-100;
   }
 }
+
+/* Phones: the map is cropped to fill the ticket stage edge to edge, so fade it
+   out at the sides (the image itself already fades out at the top and bottom). */
+@media (max-width: 639px) {
+  .map-fade-x {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 22%, #000 78%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 22%, #000 78%, transparent);
+  }
+}
