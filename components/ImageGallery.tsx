@@ -59,11 +59,12 @@ export default function ImageGallery() {
 
   return (
     <MotionConfig reducedMotion="user">
-      {/* Phones: title pinned under the fixed top buttons (16px + 42px + 16px),
-          controls pinned to the bottom, and the ticket stage fills the space in
-          between, so nothing moves when tickets of different shapes come and go.
+      {/* Phones: the controls are fixed to the screen corners, mirroring the
+          top buttons; the page reserves room for both rows (16px + 42px + 16px)
+          and the ticket stage fills the space in between, so nothing moves when
+          tickets of different shapes come and go.
           Larger screens: everything centred as one group. */}
-      <div className="flex min-h-[100dvh] flex-col items-center pb-6 pt-[74px] sm:min-h-screen sm:justify-center sm:py-0">
+      <div className="flex min-h-[100dvh] flex-col items-center py-[74px] sm:min-h-screen sm:justify-center sm:py-0">
         <CityText city={currentCity.city} transport={currentCity.transport} />
         <div className="flex w-full flex-1 flex-row items-center justify-center gap-4 sm:flex-none sm:px-12">
           <ChevronButton
@@ -86,8 +87,10 @@ export default function ImageGallery() {
             variant="next"
           />
         </div>
-        {/* Mobile Navigation */}
-        <div className="mt-4 flex w-full max-w-[382px] items-center justify-between gap-8 px-4 sm:mt-0 sm:max-w-[350px] sm:justify-center sm:px-3">
+        {/* Phones: arrows bottom-left, Flip bottom-right, lined up with the
+            Enable tilt and theme buttons above. Larger screens: Flip centred
+            under the ticket (the arrows sit beside it). */}
+        <div className="fixed inset-x-4 bottom-4 z-40 flex items-center justify-between sm:static sm:justify-center">
           <div className="flex flex-row items-center gap-4 sm:hidden">
             <ChevronButton onClick={goToPrevious} aria-label="Previous ticket" variant="previous" />
             <ChevronButton onClick={goToNext} aria-label="Next ticket" variant="next" />

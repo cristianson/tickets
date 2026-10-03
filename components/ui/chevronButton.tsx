@@ -1,5 +1,5 @@
 import { useId, type ButtonHTMLAttributes } from "react";
-import { cn, commonButtonStyles } from "@/lib/utils";
+import { cn, commonButtonStyles, iconButtonStyles } from "@/lib/utils";
 import InsetShadowFilter from "./insetShadowFilter";
 
 const ARROW_PATHS = {
@@ -18,18 +18,14 @@ export default function ChevronButton({ className, variant, ...props }: ChevronB
   return (
     <button
       type="button"
-      className={cn(
-        commonButtonStyles,
-        "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
-        className
-      )}
+      className={cn(commonButtonStyles, iconButtonStyles, className)}
       {...props}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         fill="none"
-        className="h-5 w-5"
+        className="h-6 w-6"
         aria-hidden="true"
       >
         <defs>

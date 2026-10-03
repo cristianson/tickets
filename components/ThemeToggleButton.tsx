@@ -3,7 +3,7 @@
 import { useEffect, useId, useState } from "react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn, commonButtonStyles } from "@/lib/utils";
+import { cn, commonButtonStyles, iconButtonStyles } from "@/lib/utils";
 import InsetShadowFilter from "./ui/insetShadowFilter";
 
 const SUN_PATHS = [
@@ -46,10 +46,7 @@ export const ThemeToggleButton = () => {
     <motion.button
       aria-label={mounted ? `Switch to ${isDark ? "light" : "dark"} theme` : "Toggle theme"}
       type="button"
-      className={cn(
-        commonButtonStyles,
-        "fixed right-4 top-4 z-50 overflow-hidden rounded-full p-2"
-      )}
+      className={cn(commonButtonStyles, iconButtonStyles, "fixed right-4 top-4 z-50 overflow-hidden")}
       onClick={() => setTheme(isDark ? "light" : "dark")}
       whileHover={{ scale: 1.1, rotate: 90 }}
       whileTap={{ scale: 0.9, rotate: -90 }}

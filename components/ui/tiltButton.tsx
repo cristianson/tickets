@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { requestTiltPermission, useTiltPermission } from "@/lib/deviceTilt";
-import { cn, commonButtonStyles } from "@/lib/utils";
+import { cn, commonButtonStyles, pillButtonStyles } from "@/lib/utils";
 import { TOUCH_DEVICE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 
 // Shown only on phones whose browser requires permission for motion sensors
@@ -24,11 +24,7 @@ export default function TiltButton() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className={cn(
-            commonButtonStyles,
-            // Same height as the round theme toggle (24px icon + p-2 + border).
-            "fixed left-4 top-4 z-50 inline-flex h-[42px] items-center justify-center gap-1.5 rounded-full px-4"
-          )}
+          className={cn(commonButtonStyles, pillButtonStyles, "fixed left-4 top-4 z-50")}
         >
           <span className="text-sm font-medium">Enable tilt</span>
           <svg

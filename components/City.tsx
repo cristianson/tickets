@@ -48,8 +48,9 @@ const TicketImage = ({ city, side, priority, onLoad }: TicketImageProps) => (
     fetchPriority={priority ? "high" : undefined}
     draggable={false}
     onLoad={onLoad}
-    // On phones, never taller than the space between the title and controls.
-    className="h-auto max-h-[min(450px,calc(100dvh_-_280px))] w-auto max-w-full object-contain sm:max-h-[450px]"
+    // On phones, never taller than the space between the title and controls
+    // (two 74px button rows + 72px title + breathing room).
+    className="h-auto max-h-[min(450px,calc(100dvh_-_260px))] w-auto max-w-full object-contain sm:max-h-[450px]"
   />
 );
 
