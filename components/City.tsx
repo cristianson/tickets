@@ -1,18 +1,27 @@
 "use client";
 
 import Image from "next/image";
-import { useTheme } from "next-themes";
-import { CityData } from "@/lib/cityData";
-import { AnimatePresence, motion } from "framer-motion";
-import { withFlip } from "./withFlip";
-
-const fadeVariants = {
-  enter: { opacity: 0 },
-  center: { opacity: 1 },
-  exit: { opacity: 0 },
-};
+import { AnimatePresence, motion, type PanInfo } from "framer-motion";
+import type { CityData } from "@/lib/cityData";
+import { mapImage, TICKET_SIZES, type MapVariant } from "@/lib/images";
+import { TOUCH_DEVICE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
+import FlipCard from "./FlipCard";
 
 const ANIMATION_OFFSET = 350;
+
+// Changing city: the old map fades out while the new one fades in, both
+// drifting a little in the direction the ticket slides, so the map and ticket
+// move as one. Runs alongside the ticket's exit and entrance (~0.45s in total).
+const MAP_DRIFT = 40; // px
+const mapVariants = {
+  enter: (direction: number) => ({ opacity: 0, x: direction * MAP_DRIFT }),
+  center: { opacity: 1, x: 0 },
+  exit: (direction: number) => ({ opacity: 0, x: -direction * MAP_DRIFT }),
+};
+
+// A swipe counts once the finger has travelled this far, or flicked this fast.
+const SWIPE_DISTANCE = 80; // px
+const SWIPE_VELOCITY = 400; // px/s
 
 const slideVariants = {
   enter: (direction: number) => ({
@@ -24,78 +33,140 @@ const slideVariants = {
     x: 0,
     opacity: 1,
   },
+  // A quick, eased exit: with mode="wait" the next ticket only enters once the
+  // exit has finished, and the spring used for entering took ~450ms to settle
+  // while the ticket was already invisible, leaving a gap with no ticket.
   exit: (direction: number) => ({
     zIndex: 0,
     x: direction < 0 ? ANIMATION_OFFSET : -ANIMATION_OFFSET,
     opacity: 0,
+    transition: { x: { duration: 0.2, ease: "easeIn" as const }, opacity: { duration: 0.15 } },
   }),
 };
 
-type ImageProps = {
-  ticketImage: CityData["ticketImage"];
-  cityName: string;
-  side?: "front" | "back";
+type TicketImageProps = {
+  city: CityData;
+  side: "front" | "back";
+  isFirst: boolean;
 };
 
-const TicketImage = ({ ticketImage, cityName, side = "front" }: ImageProps) => (
+// Both faces load eagerly: the back is hidden and rotated 180deg until flipped,
+// and Safari's lazy loading doesn't reliably notice when a rotated element
+// becomes visible, which could leave the back blank. Instead the back loads at
+// low priority, so it doesn't compete with the front. The first city's front
+// is the page's main image, so it gets high priority.
+const TicketImage = ({ city, side, isFirst }: TicketImageProps) => (
   <Image
-    src={side === "front" ? ticketImage.front : ticketImage.back}
-    alt={`${cityName} transport ticket ${side}`}
-    width={350}
-    height={0}
-    style={{
-      maxHeight: "450px", //Max height of the ticket image
-      width: "auto",
-      height: "auto",
-      objectFit: "contain",
-      maxWidth: "100%",
-    }}
-    priority
+    src={city.ticketImage[side]}
+    alt={`${city.city} transport ticket ${side}`}
+    sizes={TICKET_SIZES}
+    placeholder="blur"
+    loading="eager"
+    fetchPriority={side === "back" ? "low" : isFirst ? "high" : undefined}
+    draggable={false}
+    // On phones, never taller than the space between the title and controls
+    // (two 74px button rows + 72px title + breathing room).
+    className="h-auto max-h-[min(450px,calc(100dvh_-_260px))] w-auto max-w-full object-contain sm:max-h-[450px]"
   />
 );
 
-const FlippableTicket = withFlip(TicketImage);
+type TicketProps = {
+  city: CityData;
+  isFirst: boolean;
+  isFlipped: boolean;
+  onFlip: () => void;
+};
+
+function Ticket({ city, isFirst, isFlipped, onFlip }: TicketProps) {
+  // The back is always in the page (not added once the front has loaded):
+  // Safari can fail to paint content added later to a hidden, rotated layer.
+  return (
+    <FlipCard
+      isFlipped={isFlipped}
+      onFlip={onFlip}
+      front={<TicketImage city={city} side="front" isFirst={isFirst} />}
+      back={<TicketImage city={city} side="back" isFirst={isFirst} />}
+    />
+  );
+}
+
+// One theme's map. Phones get a crop of the middle of the map that covers the
+// ticket stage and fades out at the sides (see globals.css); larger screens get
+// the whole map. Both <Image>s are in the page and CSS shows one: the hidden
+// one is display:none and lazy, so the browser never downloads it. The same
+// trick on the wrapper hides the other theme's map.
+// No placeholder: until the map has loaded nothing is shown. A scaled-up tiny
+// version showed as a visible rectangle, because its edge pixels aren't fully
+// transparent like the real map's faded edges.
+// The visible map is the largest element on screen (the LCP), hence high
+// fetch priority.
+function CityMap({ city, theme }: { city: CityData; theme: "light" | "dark" }) {
+  const map = (variant: MapVariant, className: string) => {
+    return (
+      <Image
+        {...mapImage(city, theme, variant)}
+        alt=""
+        fill
+        loading="lazy"
+        fetchPriority="high"
+        className={`map-fade-x pointer-events-none ${variant === "mobile" ? "object-cover" : "object-contain"} ${className}`}
+      />
+    );
+  };
+  return (
+    <div className={`absolute inset-0 ${theme === "light" ? "dark:hidden" : "hidden dark:block"}`}>
+      {map("mobile", "sm:hidden")}
+      {map("desktop", "hidden sm:block")}
+    </div>
+  );
+}
 
 type Props = {
   city: CityData;
   direction: number;
   index: number;
-  onToggleFlip?: (toggleFn: () => void) => void;
+  isFlipped: boolean;
+  onSwipe: (step: 1 | -1) => void;
+  onFlip: () => void;
 };
 
-export default function City({ city, direction, index, onToggleFlip }: Props) {
-  const { resolvedTheme } = useTheme();
+export default function City({ city, direction, index, isFlipped, onSwipe, onFlip }: Props) {
+  const isTouchDevice = useMediaQuery(TOUCH_DEVICE_QUERY);
 
-  const transition = { duration: 0.3, ease: "easeInOut" };
+  const handleDragEnd = (_: unknown, { offset, velocity }: PanInfo) => {
+    if (offset.x < -SWIPE_DISTANCE || velocity.x < -SWIPE_VELOCITY) onSwipe(1);
+    else if (offset.x > SWIPE_DISTANCE || velocity.x > SWIPE_VELOCITY) onSwipe(-1);
+  };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center max-w-[902px] min-h-[540px] relative transition-colors duration-300 ease-in-out overflow-hidden">
-      {/* Light Background Image */}
-      <motion.div
-        className="absolute inset-0 z-0 bg-center bg-no-repeat bg-contain"
-        style={{
-          backgroundImage: `url(${city.backgroundImage.light})`,
-        }}
-        initial={false}
-        animate={{ opacity: resolvedTheme === "light" ? 1 : 0 }}
-        transition={transition}
-      />
-      {/* Dark Background Image */}
-      <motion.div
-        className="absolute inset-0 z-0 bg-center bg-no-repeat bg-contain"
-        style={{
-          backgroundImage: `url(${city.backgroundImage.dark})`,
-        }}
-        initial={false}
-        animate={{ opacity: resolvedTheme === "dark" ? 1 : 0 }}
-        transition={transition}
-      />
+    // select-none: double-clicking the ticket (to flip it twice) would
+    // otherwise highlight the images as selected.
+    <div className="relative flex min-h-[300px] w-full max-w-[902px] select-none flex-col items-center justify-center self-stretch overflow-hidden sm:min-h-[540px] sm:self-auto">
+      {/* Both themes' maps are in the page and CSS shows the current one, so
+          the right map is there on first paint (the theme class is set before
+          the page renders). ImageGallery preloads the other theme's map when
+          idle so a theme switch is instant; the switch itself is cross-faded
+          by ThemeToggleButton. Keyed by city, so changing city cross-fades
+          from the old map to the new one (mapVariants above). */}
+      <AnimatePresence initial={false} custom={direction}>
+        <motion.div
+          key={city.city}
+          custom={direction}
+          variants={mapVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+          className="pointer-events-none absolute inset-0"
+        >
+          <CityMap city={city} theme="light" />
+          <CityMap city={city} theme="dark" />
+        </motion.div>
+      </AnimatePresence>
 
-      {/* Ticket Container */}
-      <div
-        className="w-full max-w-[350px] relative flex flex-col items-center justify-center z-20" // Above gradient
-        style={{ minHeight: 200, maxHeight: "760px", overflow: "visible" }}
-      >
+      {/* The ticket column fills the full height so a swipe anywhere on it
+          (not only on the ticket itself) changes city. */}
+      <div className="relative z-20 flex max-h-[760px] min-h-[200px] w-full max-w-[382px] flex-1 flex-col items-center justify-center px-4 sm:max-w-[350px] sm:px-0">
         <AnimatePresence initial={false} custom={direction} mode="wait">
           <motion.div
             key={index}
@@ -108,13 +179,14 @@ export default function City({ city, direction, index, onToggleFlip }: Props) {
               x: { type: "spring", stiffness: 500, damping: 40 },
               opacity: { duration: 0.15 },
             }}
-            className="w-full top-0 left-0"
+            // Swipe left/right on touch devices; vertical scrolling still works.
+            drag={isTouchDevice ? "x" : false}
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.7}
+            onDragEnd={handleDragEnd}
+            className="flex w-full flex-1 items-center justify-center"
           >
-            <FlippableTicket
-              ticketImage={city.ticketImage}
-              cityName={city.city}
-              onToggleFlip={onToggleFlip}
-            />
+            <Ticket city={city} isFirst={index === 0} isFlipped={isFlipped} onFlip={onFlip} />
           </motion.div>
         </AnimatePresence>
       </div>

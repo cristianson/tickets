@@ -1,27 +1,18 @@
-import { cn } from "@/lib/utils";
-import { commonButtonStyles } from "@/lib/utils";
+import { cn, commonButtonStyles, pillButtonStyles } from "@/lib/utils";
 
 type FlipButtonProps = {
   onClick: () => void;
+  isFlipped: boolean;
   className?: string;
 };
 
-export default function FlipButton({
-  onClick,
-  className = "",
-}: FlipButtonProps) {
-  const specificStyles =
-    "h-9 px-3 rounded-xl inline-flex gap-1.5 items-center justify-center";
-
+export default function FlipButton({ onClick, isFlipped, className }: FlipButtonProps) {
   return (
     <button
+      type="button"
       onClick={onClick}
-      className={cn(
-        commonButtonStyles,
-        specificStyles,
-        "transition-colors duration-200 ease-linear",
-        className
-      )}
+      aria-pressed={isFlipped}
+      className={cn(commonButtonStyles, pillButtonStyles, className)}
     >
       <span className="text-sm font-medium">Flip ticket</span>
       <svg
