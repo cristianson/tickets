@@ -165,15 +165,15 @@ export default function City({ city, direction, index, isFlipped, onSwipe, onFli
       </AnimatePresence>
 
       {/* The maps are drawn from OpenStreetMap data (scripts/maps), whose
-          licence asks for this credit. Above the ticket column so it stays
-          clickable. */}
+          licence asks for this credit; kept small and faint in the corner.
+          Above the ticket column so it stays clickable. */}
       <a
         href="https://www.openstreetmap.org/copyright"
         target="_blank"
         rel="noopener noreferrer"
-        className="absolute bottom-0 z-30 text-[10px] leading-4 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+        className="absolute bottom-0 right-1 z-30 text-[9px] leading-4 text-gray-400 opacity-60 transition-opacity hover:opacity-100 dark:text-gray-500"
       >
-        © OpenStreetMap contributors
+        © OpenStreetMap
       </a>
 
       {/* The ticket column fills the full height so a swipe anywhere on it
