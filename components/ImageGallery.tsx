@@ -62,11 +62,12 @@ export default function ImageGallery() {
   return (
     <MotionConfig reducedMotion="user">
       {/* Phones: the controls are fixed to the screen corners, mirroring the
-          top buttons; the page reserves room for both rows (16px + 42px + 16px)
-          and the ticket stage fills the space in between, so nothing moves when
-          tickets of different shapes come and go.
+          top buttons; the page reserves room for both rows (top: 16px + 42px +
+          16px; bottom: the credit line + 42px + 16px) and the ticket stage fills
+          the space in between, so nothing moves when tickets of different
+          shapes come and go.
           Larger screens: everything centred as one group. */}
-      <div className="flex min-h-[100dvh] flex-col items-center py-[74px] sm:min-h-screen sm:justify-center sm:py-0">
+      <div className="flex min-h-[100dvh] flex-col items-center pb-[92px] pt-[74px] sm:min-h-screen sm:justify-center sm:py-0">
         <CityText city={currentCity.city} transport={currentCity.transport} />
         <div className="flex w-full flex-1 flex-row items-center justify-center gap-4 sm:flex-none sm:px-12">
           <ChevronButton
@@ -91,15 +92,29 @@ export default function ImageGallery() {
           />
         </div>
         {/* Phones: arrows bottom-left, Flip bottom-right, lined up with the
-            Enable tilt and theme buttons above. Larger screens: Flip centred
-            under the ticket (the arrows sit beside it). */}
-        <div className="fixed inset-x-4 bottom-4 z-40 flex items-center justify-between sm:static sm:justify-center">
+            Enable tilt and theme buttons above, with the credit line under
+            them. Larger screens: Flip centred under the ticket (the arrows sit
+            beside it). */}
+        <div className="fixed inset-x-4 bottom-[34px] z-40 flex items-center justify-between sm:static sm:justify-center">
           <div className="flex flex-row items-center gap-4 sm:hidden">
             <ChevronButton onClick={goToPrevious} aria-label="Previous ticket" variant="previous" />
             <ChevronButton onClick={goToNext} aria-label="Next ticket" variant="next" />
           </div>
           <FlipButton onClick={toggleFlip} isFlipped={isFlipped} />
         </div>
+        {/* Same credit line as drawarun.com. Phones: pinned to the bottom edge,
+            under the controls; larger screens: under the Flip button. */}
+        <p className="fixed inset-x-0 bottom-2 z-40 select-none whitespace-nowrap text-center text-[11px] leading-[1.5] text-gray-400 dark:text-gray-500 sm:static sm:mt-6 sm:pb-6">
+          Made with love in Cluj-Napoca, Romania · by{" "}
+          <a
+            href="https://x.com/CristianIordan_"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="border-b border-gray-200 text-gray-600 transition-colors hover:border-current hover:text-black dark:border-gray-700 dark:text-gray-300 dark:hover:text-white"
+          >
+            Cristian Iordan
+          </a>
+        </p>
       </div>
     </MotionConfig>
   );

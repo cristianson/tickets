@@ -25,10 +25,10 @@ export function mapImage(
   return variant === "mobile"
     ? {
         src: city.mobileBackgroundImage[theme],
-        // The stage is the screen height minus the two 74px button rows and the
-        // 72px title; the crop (0.835 aspect ratio, see
-        // scripts/optimize-images.mjs) is drawn at that height.
-        sizes: "calc((100vh - 220px) * 0.835)",
+        // The stage is the screen height minus the button rows (74px top, 92px
+        // bottom with the credit line) and the 72px title; the crop (0.835
+        // aspect ratio, see scripts/optimize-images.mjs) is drawn at that height.
+        sizes: "calc((100vh - 238px) * 0.835)",
         quality: 75,
       }
     : { src: city.backgroundImage[theme], sizes: "(max-width: 902px) 100vw, 902px", quality: 100 };
