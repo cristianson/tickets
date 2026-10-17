@@ -65,9 +65,9 @@ const TicketImage = ({ city, side, isFirst }: TicketImageProps) => (
     fetchPriority={side === "back" ? "low" : isFirst ? "high" : undefined}
     draggable={false}
     // On phones, never taller than the space between the title and controls
-    // (the 74px top row, the 92px bottom row with the credit line, the 72px
+    // (the 74px top row, the 102px bottom row with the credit line, the 72px
     // title and breathing room).
-    className="h-auto max-h-[min(450px,calc(100dvh_-_278px))] w-auto max-w-full object-contain sm:max-h-[450px]"
+    className="h-auto max-h-[min(450px,calc(100dvh_-_288px))] w-auto max-w-full object-contain sm:max-h-[450px]"
   />
 );
 
