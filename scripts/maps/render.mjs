@@ -33,41 +33,52 @@ const GLYPHS_URL = "https://raw.githubusercontent.com/protomaps/basemaps-assets/
 const FONT = "Noto Sans Regular";
 const FONT_MEDIUM = "Noto Sans Medium";
 
-// Colours sampled from the original Snazzy Maps backgrounds. "Shades of Grey"
-// is black at Google lightness 16-21 (so #292929-#363636), labels at 40.
+// The two Snazzy Maps styles, translated from their Google Maps style JSON.
+// Google's "lightness" L on black is 255 * L / 100, so Shades of Grey's
+// landscape at 20 is #333333. OSM road classes map onto Google's road types:
+// highway = motorway, trunk, primary; arterial = secondary, tertiary;
+// local = the rest. null = not drawn (Even Lighter hides transit).
 const THEMES = {
+  // "Even Lighter" by Anda.
   light: {
-    land: "#fcfcfc",
-    park: "#e3eed5",
-    water: "#dfeff5",
-    rail: "#e4dede",
-    minor: "#ececec",
-    tertiary: "#e8e8e8",
-    major: "#f2d3c4",
-    motorway: "#efc6b5",
-    casing: null,
-    label: "#5f8f98",
-    labelHalo: "#fcfcfc",
-    cityLabel: "#56858e",
+    land: "#ffffff", // landscape geometry.fill
+    park: "#e6f3d6", // poi.park
+    water: "#eaf6f8",
+    rail: null, // transit: off
+    // road: saturation -100, lightness 45 (Google's grey local and arterial
+    // road edges, lightened); road.arterial fill #f4f4f4.
+    local: "#eeeeee",
+    arterial: "#f4f4f4",
+    arterialCasing: "#e8e8e8",
+    highway: "#f4d2c5", // road.highway geometry.fill
+    highwayCasing: null,
+    label: "#6195a0", // administrative labels
+    labelHalo: "#ffffff", // Google's default label outline
+    highwayLabel: "#4e4e4e",
+    arterialLabel: "#787878",
   },
+  // "Shades of Grey" by Adam Krogh.
   dark: {
-    land: "#303030",
-    park: "#343434",
-    water: "#262626",
-    rail: "#2c2c2c",
-    minor: "#2a2a2a",
-    tertiary: "#2a2a2a",
-    major: "#2c2c2c",
-    motorway: "#282828",
-    casing: "#3f3f3f",
-    label: "#6b6b6b",
-    labelHalo: "#292929",
-    cityLabel: "#8a8a8a",
+    land: "#333333", // landscape, lightness 20
+    park: "#363636", // poi, 21
+    water: "#2b2b2b", // 17
+    rail: "#303030", // transit, 19
+    local: "#292929", // road.local, 16
+    arterial: "#2e2e2e", // road.arterial, 18
+    arterialCasing: null,
+    highway: "#2b2b2b", // road.highway fill, 17
+    highwayCasing: "#4a4a4a", // road.highway stroke, 29, weight 0.2
+    label: "#666666", // labels.text.fill, 40
+    labelHalo: "#292929", // labels.text.stroke, 16
+    highwayLabel: "#666666",
+    arterialLabel: "#666666",
   },
 };
 
 // Line widths (CSS px) by zoom: zoomed-out (bigger) cities get finer lines.
 const width = (z12, z14) => ["interpolate", ["exponential", 1.6], ["zoom"], 12, z12, 14, z14];
+// A line's width plus an outline of `edge` px on each side.
+const outlined = (z12, z14, edge) => width(z12 + 2 * edge, z14 + 2 * edge);
 
 function style(theme, data, city) {
   const c = THEMES[theme];
@@ -82,7 +93,25 @@ function style(theme, data, city) {
     layout: { "line-cap": "round", "line-join": "round" },
     paint: { "line-color": color, "line-width": w },
   });
-  const majorRoads = roadClass("primary", "secondary", "trunk");
+  const local = roadClass("residential", "living_street", "unclassified", "pedestrian");
+  const arterial = roadClass("secondary", "tertiary");
+  const highway = roadClass("trunk", "primary");
+  const motorway = roadClass("motorway");
+  const roadLabel = (id, filter, color) => ({
+    id,
+    type: "symbol",
+    source: "osm",
+    filter: ["all", filter, ["has", "name"]],
+    layout: {
+      "symbol-placement": "line",
+      "symbol-spacing": 300,
+      "text-field": ["get", "name"],
+      "text-font": [FONT],
+      "text-size": 8,
+      "text-letter-spacing": 0.02,
+    },
+    paint: { "text-color": color, "text-halo-color": c.labelHalo, "text-halo-width": 1 },
+  });
 
   return {
     version: 8,
@@ -103,39 +132,20 @@ function style(theme, data, city) {
       { id: "park", type: "fill", source: "osm", filter: layer("park"), paint: { "fill-color": c.park } },
       { id: "water", type: "fill", source: "osm", filter: layer("water"), paint: { "fill-color": c.water } },
       road("waterway", layer("waterway"), c.water, width(0.8, 2.4)),
-      {
-        id: "rail",
-        type: "line",
-        source: "osm",
-        filter: layer("rail"),
-        paint: { "line-color": c.rail, "line-width": width(0.5, 1) },
-      },
-      road("road-minor", roadClass("residential", "living_street", "unclassified", "pedestrian"), c.minor, width(0.4, 1.2)),
-      road("road-tertiary", roadClass("tertiary"), c.tertiary, width(0.6, 1.8)),
-      // Shades of Grey outlines the main roads with a slightly lighter edge.
-      ...(c.casing
+      ...(c.rail ? [road("rail", layer("rail"), c.rail, width(0.5, 1))] : []),
+      road("road-local", local, c.local, width(0.4, 1.2)),
+      ...(c.arterialCasing ? [road("road-arterial-casing", arterial, c.arterialCasing, outlined(0.6, 1.8, 0.3))] : []),
+      road("road-arterial", arterial, c.arterial, width(0.6, 1.8)),
+      ...(c.highwayCasing
         ? [
-            road("road-major-casing", majorRoads, c.casing, width(1.4, 3.2)),
-            road("road-motorway-casing", roadClass("motorway"), c.casing, width(1.7, 3.8)),
+            road("road-highway-casing", highway, c.highwayCasing, outlined(0.9, 2.6, 0.2)),
+            road("road-motorway-casing", motorway, c.highwayCasing, outlined(1.2, 3.2, 0.2)),
           ]
         : []),
-      road("road-major", majorRoads, c.major, width(0.9, 2.6)),
-      road("road-motorway", roadClass("motorway"), c.motorway, width(1.2, 3.2)),
-      {
-        id: "road-label",
-        type: "symbol",
-        source: "osm",
-        filter: ["all", majorRoads, ["has", "name"]],
-        layout: {
-          "symbol-placement": "line",
-          "symbol-spacing": 300,
-          "text-field": ["get", "name"],
-          "text-font": [FONT],
-          "text-size": 8,
-          "text-letter-spacing": 0.02,
-        },
-        paint: { "text-color": c.label, "text-halo-color": c.labelHalo, "text-halo-width": 1, "text-opacity": 0.8 },
-      },
+      road("road-highway", highway, c.highway, width(0.9, 2.6)),
+      road("road-motorway", motorway, c.highway, width(1.2, 3.2)),
+      roadLabel("road-label-arterial", roadClass("secondary"), c.arterialLabel),
+      roadLabel("road-label-highway", roadClass("motorway", "trunk", "primary"), c.highwayLabel),
       {
         id: "place-label",
         type: "symbol",
@@ -177,7 +187,7 @@ function style(theme, data, city) {
           "text-allow-overlap": true,
           "symbol-z-order": "source",
         },
-        paint: { "text-color": c.cityLabel, "text-halo-color": c.labelHalo, "text-halo-width": 1.5 },
+        paint: { "text-color": c.label, "text-halo-color": c.labelHalo, "text-halo-width": 1.5 },
       },
     ],
   };
