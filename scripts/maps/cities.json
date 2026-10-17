@@ -8,6 +8,7 @@
     { "id": "hamburg", "label": "Hamburg", "center": [9.995, 53.551], "zoom": 12.45 },
     { "id": "munich", "label": "Munich", "center": [11.575, 48.139], "zoom": 12.8 },
     { "id": "funchal", "label": "Funchal", "center": [-16.912, 32.652], "zoom": 13.35, "coastal": true },
-    { "id": "bucharest", "label": "Bucharest", "center": [26.100, 44.433], "zoom": 12.35 }
+    { "id": "bucharest", "label": "Bucharest", "center": [26.100, 44.433], "zoom": 12.35 },
+    { "id": "dublin", "label": "Dublin", "center": [-6.260, 53.348], "zoom": 12.45, "coastal": true }
   ]
 }
