@@ -54,6 +54,12 @@ import dublinMapLight from "@/assets/maps/light/bg_dublin.webp";
 import dublinMapDark from "@/assets/maps/dark/bg_dublin.webp";
 import dublinMapLightMobile from "@/assets/maps/mobile/light/bg_dublin.webp";
 import dublinMapDarkMobile from "@/assets/maps/mobile/dark/bg_dublin.webp";
+import pragueFront from "@/assets/tickets/prague/prague_front.webp";
+import pragueBack from "@/assets/tickets/prague/prague_back.webp";
+import pragueMapLight from "@/assets/maps/light/bg_prague.webp";
+import pragueMapDark from "@/assets/maps/dark/bg_prague.webp";
+import pragueMapLightMobile from "@/assets/maps/mobile/light/bg_prague.webp";
+import pragueMapDarkMobile from "@/assets/maps/mobile/dark/bg_prague.webp";
 
 // Images are statically imported so Next.js knows their dimensions (no layout
 // shift), generates blur placeholders, and serves them from content-hashed,
@@ -139,6 +145,13 @@ const Cities: CityData[] = [
     ticketImage: { front: dublinFront, back: dublinBack },
     backgroundImage: { light: dublinMapLight, dark: dublinMapDark },
     mobileBackgroundImage: { light: dublinMapLightMobile, dark: dublinMapDarkMobile },
+  },
+  {
+    city: "Prague, Czech Republic",
+    transport: "All public transport",
+    ticketImage: { front: pragueFront, back: pragueBack },
+    backgroundImage: { light: pragueMapLight, dark: pragueMapDark },
+    mobileBackgroundImage: { light: pragueMapLightMobile, dark: pragueMapDarkMobile },
   },
 ];
 
