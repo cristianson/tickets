@@ -1,0 +1,13 @@
+{
+  "_comment": "Framing of each map background, shared by both themes. center is [lon, lat]; zoom is a MapLibre zoom (512px tiles) at the render size in render.mjs. The file name matches assets/maps/<theme>/bg_<id>.webp. coastal: the sea is drawn as the background, with the land over it.",
+  "cities": [
+    { "id": "warsaw", "label": "Warsaw", "center": [21.018, 52.236], "zoom": 12.3 },
+    { "id": "amsterdam", "label": "Amsterdam", "center": [4.895, 52.368], "zoom": 12.65 },
+    { "id": "berlin", "label": "Berlin", "center": [13.405, 52.515], "zoom": 12.15 },
+    { "id": "cluj", "label": "Cluj-Napoca", "center": [23.594, 46.770], "zoom": 13.05 },
+    { "id": "hamburg", "label": "Hamburg", "center": [9.995, 53.551], "zoom": 12.45 },
+    { "id": "munich", "label": "Munich", "center": [11.575, 48.139], "zoom": 12.8 },
+    { "id": "funchal", "label": "Funchal", "center": [-16.912, 32.652], "zoom": 13.35, "coastal": true },
+    { "id": "bucharest", "label": "Bucharest", "center": [26.100, 44.433], "zoom": 12.35 }
+  ]
+}

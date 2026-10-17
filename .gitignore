@@ -31,3 +31,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# map data downloaded by scripts/maps/fetch_osm.py
+/scripts/maps/data/

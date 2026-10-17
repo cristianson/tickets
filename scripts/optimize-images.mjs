@@ -72,10 +72,12 @@ for (const theme of ["light", "dark"]) {
   await mkdir(outDir, { recursive: true });
   for (const name of await readdir(dir)) {
     const out = path.join(outDir, name);
-    if (!force && (await exists(out))) continue;
-    const { width, height } = await sharp(path.join(dir, name)).metadata();
+    const src = path.join(dir, name);
+    // Redo a crop when its map has changed since (e.g. re-rendered).
+    if (!force && (await exists(out)) && (await stat(out)).mtimeMs >= (await stat(src)).mtimeMs) continue;
+    const { width, height } = await sharp(src).metadata();
     const cropWidth = Math.round(width * MOBILE_CROP_WIDTH);
-    const info = await sharp(path.join(dir, name))
+    const info = await sharp(src)
       .extract({ left: Math.round((width - cropWidth) / 2), top: 0, width: cropWidth, height })
       .webp({ quality: 90, alphaQuality: 100, effort: 6 })
       .toFile(out);
