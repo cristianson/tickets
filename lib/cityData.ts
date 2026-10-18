@@ -66,6 +66,8 @@ import pragueMapDarkMobile from "@/assets/maps/mobile/dark/bg_prague.webp";
 // immutable-cached URLs.
 export type CityData = {
   city: string;
+  // Matches the maps' file names (bg_<slug>), e.g. for lib/mapVariants.json.
+  slug: string;
   transport: string;
   ticketImage: {
     front: StaticImageData;
@@ -85,6 +87,7 @@ export type CityData = {
 const Cities: CityData[] = [
   {
     city: "Warsaw, Poland",
+    slug: "warsaw",
     transport: "Train",
     ticketImage: { front: warsawFront, back: warsawBack },
     backgroundImage: { light: warsawMapLight, dark: warsawMapDark },
@@ -92,6 +95,7 @@ const Cities: CityData[] = [
   },
   {
     city: "Amsterdam, Netherlands",
+    slug: "amsterdam",
     transport: "Train",
     ticketImage: { front: amsterdamFront, back: amsterdamBack },
     backgroundImage: { light: amsterdamMapLight, dark: amsterdamMapDark },
@@ -99,6 +103,7 @@ const Cities: CityData[] = [
   },
   {
     city: "Berlin, Germany",
+    slug: "berlin",
     transport: "Train",
     ticketImage: { front: berlinFront, back: berlinBack },
     backgroundImage: { light: berlinMapLight, dark: berlinMapDark },
@@ -106,6 +111,7 @@ const Cities: CityData[] = [
   },
   {
     city: "Cluj-Napoca, Romania",
+    slug: "cluj",
     transport: "Bus",
     ticketImage: { front: clujFront, back: clujBack },
     backgroundImage: { light: clujMapLight, dark: clujMapDark },
@@ -113,6 +119,7 @@ const Cities: CityData[] = [
   },
   {
     city: "Hamburg, Germany",
+    slug: "hamburg",
     transport: "Train",
     ticketImage: { front: hamburgFront, back: hamburgBack },
     backgroundImage: { light: hamburgMapLight, dark: hamburgMapDark },
@@ -120,6 +127,7 @@ const Cities: CityData[] = [
   },
   {
     city: "Munich, Germany",
+    slug: "munich",
     transport: "Train",
     ticketImage: { front: munichFront, back: munichBack },
     backgroundImage: { light: munichMapLight, dark: munichMapDark },
@@ -127,6 +135,7 @@ const Cities: CityData[] = [
   },
   {
     city: "Funchal Madeira, Portugal",
+    slug: "funchal",
     transport: "Bus",
     ticketImage: { front: funchalFront, back: funchalBack },
     backgroundImage: { light: funchalMapLight, dark: funchalMapDark },
@@ -134,6 +143,7 @@ const Cities: CityData[] = [
   },
   {
     city: "Bucharest, Romania",
+    slug: "bucharest",
     transport: "All public transport",
     ticketImage: { front: bucharestFront, back: bucharestBack },
     backgroundImage: { light: bucharestMapLight, dark: bucharestMapDark },
@@ -141,6 +151,7 @@ const Cities: CityData[] = [
   },
   {
     city: "Dublin, Ireland",
+    slug: "dublin",
     transport: "Train",
     ticketImage: { front: dublinFront, back: dublinBack },
     backgroundImage: { light: dublinMapLight, dark: dublinMapDark },
@@ -148,6 +159,7 @@ const Cities: CityData[] = [
   },
   {
     city: "Prague, Czech Republic",
+    slug: "prague",
     transport: "All public transport",
     ticketImage: { front: pragueFront, back: pragueBack },
     backgroundImage: { light: pragueMapLight, dark: pragueMapDark },

@@ -10,6 +10,16 @@ const nextConfig = {
     // Assets in /public rarely change; let browsers/CDN cache optimized variants for 30 days.
     minimumCacheTTL: 60 * 60 * 24 * 30,
   },
+  // The static AVIF maps (scripts/optimize-images.mjs) have a content hash in
+  // their names, so browsers and the CDN can keep them forever.
+  async headers() {
+    return [
+      {
+        source: "/maps/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

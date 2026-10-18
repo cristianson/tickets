@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import type { CityData } from "@/lib/cityData";
-import { mapImage, TICKET_SIZES, type MapVariant } from "@/lib/images";
+import { mapPicture, MOBILE_MAP_QUERY, TICKET_SIZES } from "@/lib/images";
 import { TOUCH_DEVICE_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 import FlipCard from "./FlipCard";
 
@@ -93,31 +93,32 @@ function Ticket({ city, isFirst, isFlipped, onFlip }: TicketProps) {
 
 // One theme's map. Phones get a crop of the middle of the map that covers the
 // ticket stage and fades out at the sides (see globals.css); larger screens get
-// the whole map. Both <Image>s are in the page and CSS shows one: the hidden
-// one is display:none and lazy, so the browser never downloads it. The same
-// trick on the wrapper hides the other theme's map.
+// the whole map. The <picture> picks one: the static AVIF files when the
+// browser shows AVIF (they come straight from the CDN, see lib/images.ts),
+// otherwise next/image's version. The other theme's map is display:none and
+// lazy, so the browser never downloads it.
 // No placeholder: until the map has loaded nothing is shown. A scaled-up tiny
 // version showed as a visible rectangle, because its edge pixels aren't fully
 // transparent like the real map's faded edges.
 // The visible map is the largest element on screen (the LCP), hence high
 // fetch priority.
 function CityMap({ city, theme }: { city: CityData; theme: "light" | "dark" }) {
-  const map = (variant: MapVariant, className: string) => {
-    return (
-      <Image
-        {...mapImage(city, theme, variant)}
-        alt=""
-        fill
-        loading="lazy"
-        fetchPriority="high"
-        className={`map-fade-x pointer-events-none ${variant === "mobile" ? "object-cover" : "object-contain"} ${className}`}
-      />
-    );
-  };
+  const mobile = mapPicture(city, theme, "mobile");
+  const desktop = mapPicture(city, theme, "desktop");
   return (
     <div className={`absolute inset-0 ${theme === "light" ? "dark:hidden" : "hidden dark:block"}`}>
-      {map("mobile", "sm:hidden")}
-      {map("desktop", "hidden sm:block")}
+      <picture>
+        <source media={MOBILE_MAP_QUERY} type="image/avif" srcSet={mobile.avifSrcSet} sizes={mobile.sizes} />
+        <source media={MOBILE_MAP_QUERY} srcSet={mobile.fallback.srcSet} sizes={mobile.sizes} />
+        <source type="image/avif" srcSet={desktop.avifSrcSet} sizes={desktop.sizes} />
+        <img
+          {...desktop.fallback}
+          alt=""
+          loading="lazy"
+          fetchPriority="high"
+          className="map-fade-x pointer-events-none object-cover sm:object-contain"
+        />
+      </picture>
     </div>
   );
 }

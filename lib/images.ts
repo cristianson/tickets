@@ -1,5 +1,6 @@
 import { getImageProps, type StaticImageData } from "next/image";
 import type { CityData } from "./cityData";
+import mapVariants from "./mapVariants.json";
 
 type Theme = "light" | "dark";
 
@@ -10,8 +11,9 @@ export const TICKET_SIZES = "350px";
 
 // Phones (below Tailwind's `sm`) show a crop of the middle of the map that
 // covers the ticket stage; larger screens show the whole map, up to 902px wide.
-const MOBILE_MAP_QUERY = "(max-width: 639px)";
+export const MOBILE_MAP_QUERY = "(max-width: 639px)";
 
+// next/image's version of a map, for browsers without AVIF (see mapPicture).
 // Next encodes AVIF quickly and with reduced colour resolution, which blurs the
 // maps' thin streets and small labels; at quality 100 the full map matches the
 // original. Phones' dense screens hide this, so their crop uses the default 75.
@@ -34,18 +36,46 @@ export function mapImage(
     : { src: city.backgroundImage[theme], sizes: "(max-width: 902px) 100vw, 902px", quality: 100 };
 }
 
-function preload(props: { src: string; srcSet?: string; sizes?: string }) {
+// What a map's <picture> offers: the static AVIF files made by
+// scripts/optimize-images.mjs, which come straight from the CDN, and
+// next/image's version for browsers without AVIF.
+export function mapPicture(city: CityData, theme: Theme, variant: MapVariant) {
+  const image = mapImage(city, theme, variant);
+  return {
+    avifSrcSet: (mapVariants as Record<string, string>)[`${variant}/${theme}/bg_${city.slug}`],
+    sizes: image.sizes,
+    fallback: getImageProps({ ...image, alt: "", fill: true }).props,
+  };
+}
+
+function preload(props: { src?: string; srcSet?: string; sizes?: string }) {
   const img = new window.Image();
   if (props.sizes) img.sizes = props.sizes;
   if (props.srcSet) img.srcset = props.srcSet;
-  img.src = props.src;
+  if (props.src) img.src = props.src;
+}
+
+// Whether the browser shows AVIF, so a preload fetches the same file as the
+// map's <picture>. Decoding a 1x1 AVIF is the reliable test.
+const AVIF_PIXEL =
+  "data:image/avif;base64,AAAAHGZ0eXBhdmlmAAAAAG1pZjFhdmlmbWlhZgAAANZtZXRhAAAAAAAAACFoZGxyAAAAAAAAAABwaWN0AAAAAAAAAAAAAAAAAAAAACJpbG9jAAAAAERAAAEAAQAAAAAA+gABAAAAAAAAAB8AAAAjaWluZgAAAAAAAQAAABVpbmZlAgAAAAABAABhdjAxAAAAAA5waXRtAAAAAAABAAAAVmlwcnAAAAA4aXBjbwAAAAxhdjFDgSACAAAAABRpc3BlAAAAAAAAAAEAAAABAAAAEHBpeGkAAAAAAwgICAAAABZpcG1hAAAAAAAAAAEAAQOBAgMAAAAnbWRhdBIACgc4AAaQENBpMhIZQmMEw88880EgAJBAyRxhQr4=";
+let avifSupport: Promise<boolean> | undefined;
+function supportsAvif() {
+  avifSupport ??= new Promise((resolve) => {
+    const img = new window.Image();
+    img.onload = () => resolve(img.naturalWidth === 1);
+    img.onerror = () => resolve(false);
+    img.src = AVIF_PIXEL;
+  });
+  return avifSupport;
 }
 
 // Warm the cache for one map (the version this screen uses), e.g. the current
 // city's map in the other theme so switching themes doesn't have to wait.
 export function preloadMap(city: CityData, theme: Theme) {
   const variant = window.matchMedia(MOBILE_MAP_QUERY).matches ? "mobile" : "desktop";
-  preload(getImageProps({ ...mapImage(city, theme, variant), alt: "", fill: true }).props);
+  const { avifSrcSet, sizes, fallback } = mapPicture(city, theme, variant);
+  supportsAvif().then((avif) => preload(avif ? { srcSet: avifSrcSet, sizes } : fallback));
 }
 
 // Warm the cache for a city the user is likely to open next: both ticket faces
