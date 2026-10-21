@@ -225,11 +225,15 @@ async function fadeEdges(png) {
 
 const PAGE = `<!doctype html><html><head><link rel="stylesheet" href="http://maps.local/maplibre-gl.css">
 <style>html,body,#map{margin:0;width:100%;height:100%}</style></head>
-<body><div id="map"></div><script src="http://maps.local/maplibre-gl.js"></script></body></html>`;
+<body><div id="map"></div><script type="module">
+import * as maplibregl from "http://maps.local/maplibre-gl.mjs";
+window.maplibregl = maplibregl;
+</script></body></html>`;
 
 const args = process.argv.slice(2).filter((a) => !a.startsWith("--"));
 const { cities } = JSON.parse(await readFile(path.join(HERE, "cities.json"), "utf8"));
-const maplibreDir = path.dirname(require.resolve("maplibre-gl/dist/maplibre-gl.js"));
+// MapLibre 6 ships ES modules, including a worker loaded from the same origin.
+const maplibreDir = path.dirname(require.resolve("maplibre-gl/dist/maplibre-gl.mjs"));
 
 // Uses the installed Google Chrome, or the Chromium at CHROMIUM_PATH.
 const browser = await chromium.launch({
@@ -246,7 +250,10 @@ await page.route("http://maps.local/**", async (route) => {
     return body ? route.fulfill({ body, contentType: "application/x-protobuf" }) : route.fulfill({ status: 404 });
   }
   if (url.pathname === "/") return route.fulfill({ body: PAGE, contentType: "text/html" });
-  return route.fulfill({ path: path.join(maplibreDir, path.basename(url.pathname)) });
+  return route.fulfill({
+    path: path.join(maplibreDir, path.basename(url.pathname)),
+    ...(url.pathname.endsWith(".mjs") ? { contentType: "text/javascript" } : {}),
+  });
 });
 await page.goto("http://maps.local/");
 
